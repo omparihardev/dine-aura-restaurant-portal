@@ -1,15 +1,30 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { signInAction, signUpAction, type AuthActionResult } from "./actions";
+import {
+    signInAction,
+    adminSignInAction,
+    signUpAction,
+    type AuthActionResult,
+} from "./actions";
 
 export default function AuthForm() {
+    const [portalType, setPortalType] = useState<"user" | "admin">("user");
     const [mode, setMode] = useState<"signin" | "signup">("signin");
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
+
+    function handlePortalTypeChange(newPortalType: "user" | "admin") {
+        setPortalType(newPortalType);
+        setMode("signin"); // Admin mode never has signup
+        setErrorMessage(null);
+        setSuccessMessage(null);
+        setShowPassword(false);
+        setShowConfirmPassword(false);
+    }
 
     function handleModeChange(newMode: "signin" | "signup") {
         setMode(newMode);
@@ -28,7 +43,13 @@ export default function AuthForm() {
 
         startTransition(async () => {
             try {
-                const action = mode === "signin" ? signInAction : signUpAction;
+                const action =
+                    portalType === "admin"
+                        ? adminSignInAction
+                        : mode === "signin"
+                        ? signInAction
+                        : signUpAction;
+
                 const result: AuthActionResult | undefined = await action(formData);
 
                 if (result?.error) {
@@ -41,9 +62,11 @@ export default function AuthForm() {
                 if (
                     err &&
                     typeof err === "object" &&
-                    "digest" in err &&
-                    typeof (err as { digest: unknown }).digest === "string" &&
-                    (err as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+                    (("digest" in err &&
+                        typeof (err as { digest: unknown }).digest === "string" &&
+                        (err as { digest: string }).digest.startsWith("NEXT_REDIRECT")) ||
+                        ("message" in err &&
+                            (err as { message: unknown }).message === "NEXT_REDIRECT"))
                 ) {
                     throw err;
                 }
@@ -54,31 +77,74 @@ export default function AuthForm() {
 
     return (
         <div className="w-full max-w-md mx-auto bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl p-8">
-            {/* Mode Switcher Tabs */}
-            <div className="flex rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1 mb-6">
+            {/* Top-Level Portal Switcher: User Login vs Admin Login */}
+            <div className="flex rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1 mb-6 border border-zinc-200/80 dark:border-zinc-700/60 shadow-inner">
                 <button
                     type="button"
-                    onClick={() => handleModeChange("signin")}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                        mode === "signin"
+                    onClick={() => handlePortalTypeChange("user")}
+                    className={`flex-1 py-2.5 px-3 text-xs sm:text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
+                        portalType === "user"
                             ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 shadow-sm"
                             : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
                     }`}
                 >
-                    Sign In
+                    <span className="text-sm">👤</span>
+                    <span>User Login</span>
                 </button>
                 <button
                     type="button"
-                    onClick={() => handleModeChange("signup")}
-                    className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
-                        mode === "signup"
-                            ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 shadow-sm"
-                            : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                    onClick={() => handlePortalTypeChange("admin")}
+                    className={`flex-1 py-2.5 px-3 text-xs sm:text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${
+                        portalType === "admin"
+                            ? "bg-amber-600 text-white shadow-md shadow-amber-600/20"
+                            : "text-zinc-500 hover:text-amber-600 dark:text-zinc-400 dark:hover:text-amber-400"
                     }`}
                 >
-                    Create Account
+                    <span className="text-sm">🛡️</span>
+                    <span>Admin Login</span>
                 </button>
             </div>
+
+            {/* Admin Badge Header when in Admin Login mode */}
+            {portalType === "admin" && (
+                <div className="mb-6 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+                    <span className="text-base flex-shrink-0 mt-0.5">🛡️</span>
+                    <div className="text-xs">
+                        <p className="font-bold">Administrative Portal</p>
+                        <p className="text-amber-800/90 dark:text-amber-300/90 text-[11px] mt-0.5">
+                            Sign in with verified administrator credentials to access restaurant directory management.
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* User Sub-Tabs: Sign In vs Create Account (Only in User Login mode) */}
+            {portalType === "user" && (
+                <div className="flex rounded-xl bg-zinc-100/70 dark:bg-zinc-800/60 p-1 mb-6 border border-zinc-200/60 dark:border-zinc-700/40">
+                    <button
+                        type="button"
+                        onClick={() => handleModeChange("signin")}
+                        className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
+                            mode === "signin"
+                                ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 shadow-sm"
+                                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                        }`}
+                    >
+                        Sign In
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => handleModeChange("signup")}
+                        className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
+                            mode === "signup"
+                                ? "bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 shadow-sm"
+                                : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                        }`}
+                    >
+                        Create Account
+                    </button>
+                </div>
+            )}
 
             {/* Error Message Alert */}
             {errorMessage && (
@@ -128,7 +194,7 @@ export default function AuthForm() {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-                {mode === "signup" && (
+                {portalType === "user" && mode === "signup" && (
                     <div>
                         <label
                             htmlFor="fullName"
@@ -159,7 +225,11 @@ export default function AuthForm() {
                         name="email"
                         type="email"
                         required
-                        placeholder="you@example.com"
+                        placeholder={
+                            portalType === "admin"
+                                ? "admin@dineaura.in"
+                                : "you@example.com"
+                        }
                         autoComplete="email"
                         className="w-full px-4 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all text-sm"
                     />
@@ -180,7 +250,11 @@ export default function AuthForm() {
                             required
                             minLength={6}
                             placeholder="At least 6 characters"
-                            autoComplete={mode === "signin" ? "current-password" : "new-password"}
+                            autoComplete={
+                                mode === "signin"
+                                    ? "current-password"
+                                    : "new-password"
+                            }
                             className="w-full pl-4 pr-11 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all text-sm"
                         />
                         <button
@@ -188,7 +262,7 @@ export default function AuthForm() {
                             onClick={() => setShowPassword((prev) => !prev)}
                             aria-label={showPassword ? "Hide password" : "Show password"}
                             title={showPassword ? "Hide password" : "Show password"}
-                            className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors focus:outline-none"
+                            className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors focus:outline-none cursor-pointer"
                         >
                             {showPassword ? (
                                 <svg
@@ -228,7 +302,7 @@ export default function AuthForm() {
                     </div>
                 </div>
 
-                {mode === "signup" && (
+                {portalType === "user" && mode === "signup" && (
                     <div>
                         <label
                             htmlFor="confirmPassword"
@@ -252,7 +326,7 @@ export default function AuthForm() {
                                 onClick={() => setShowConfirmPassword((prev) => !prev)}
                                 aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
                                 title={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-                                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors focus:outline-none"
+                                className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors focus:outline-none cursor-pointer"
                             >
                                 {showConfirmPassword ? (
                                     <svg
@@ -296,7 +370,11 @@ export default function AuthForm() {
                 <button
                     type="submit"
                     disabled={isPending}
-                    className="w-full mt-2 py-3 px-4 rounded-xl font-medium text-sm text-white bg-amber-600 hover:bg-amber-700 active:bg-amber-800 disabled:opacity-60 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                    className={`w-full mt-2 py-3 px-4 rounded-xl font-medium text-sm text-white shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${
+                        portalType === "admin"
+                            ? "bg-amber-600 hover:bg-amber-700 active:bg-amber-800"
+                            : "bg-amber-600 hover:bg-amber-700 active:bg-amber-800"
+                    }`}
                 >
                     {isPending ? (
                         <>
@@ -320,8 +398,13 @@ export default function AuthForm() {
                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                 />
                             </svg>
-                            <span>Processing...</span>
+                            <span>Authenticating...</span>
                         </>
+                    ) : portalType === "admin" ? (
+                        <span className="flex items-center gap-1.5">
+                            <span>🛡️</span>
+                            <span>Sign In to Admin Portal</span>
+                        </span>
                     ) : mode === "signin" ? (
                         "Sign In"
                     ) : (
@@ -332,24 +415,47 @@ export default function AuthForm() {
 
             {/* Bottom helper text */}
             <div className="mt-6 text-center text-xs text-zinc-500 dark:text-zinc-400">
-                {mode === "signin" ? (
+                {portalType === "admin" ? (
                     <p>
-                        New to DineAura?{" "}
+                        Need standard customer access?{" "}
                         <button
                             type="button"
-                            onClick={() => handleModeChange("signup")}
-                            className="font-semibold text-amber-600 dark:text-amber-400 hover:underline"
+                            onClick={() => handlePortalTypeChange("user")}
+                            className="font-semibold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
                         >
-                            Create an account
+                            Switch to User Login
                         </button>
                     </p>
+                ) : mode === "signin" ? (
+                    <div className="space-y-2">
+                        <p>
+                            New to DineAura?{" "}
+                            <button
+                                type="button"
+                                onClick={() => handleModeChange("signup")}
+                                className="font-semibold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
+                            >
+                                Create an account
+                            </button>
+                        </p>
+                        <p className="text-[11px] text-zinc-400 dark:text-zinc-500">
+                            Restaurant Manager or Administrator?{" "}
+                            <button
+                                type="button"
+                                onClick={() => handlePortalTypeChange("admin")}
+                                className="font-medium text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
+                            >
+                                Switch to Admin Login
+                            </button>
+                        </p>
+                    </div>
                 ) : (
                     <p>
                         Already have an account?{" "}
                         <button
                             type="button"
                             onClick={() => handleModeChange("signin")}
-                            className="font-semibold text-amber-600 dark:text-amber-400 hover:underline"
+                            className="font-semibold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
                         >
                             Sign in here
                         </button>

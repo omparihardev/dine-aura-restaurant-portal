@@ -111,6 +111,19 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                             </Link>
                         );
                     })}
+
+                    {profile?.role === "admin" && (
+                        <Link
+                            href="/admin/restaurants"
+                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+                                pathname.startsWith("/admin")
+                                    ? "bg-amber-600 text-white shadow-sm"
+                                    : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-900 hover:bg-amber-100"
+                            }`}
+                        >
+                            <span>🛡️ Admin</span>
+                        </Link>
+                    )}
                 </nav>
 
                 {/* Right section: City selector + User Profile / Auth State */}

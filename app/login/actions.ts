@@ -30,6 +30,40 @@ export async function signInAction(formData: FormData): Promise<AuthActionResult
     redirect("/dashboard");
 }
 
+export async function adminSignInAction(formData: FormData): Promise<AuthActionResult> {
+    const email = formData.get("email")?.toString().trim();
+    const password = formData.get("password")?.toString();
+
+    if (!email || !password) {
+        return { error: "Please enter both your email address and password." };
+    }
+
+    const supabase = await createClient();
+    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+    });
+
+    if (authError || !authData.user) {
+        return { error: authError?.message || "Invalid login credentials." };
+    }
+
+    // Verify role strictly from public.profiles
+    const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", authData.user.id)
+        .maybeSingle();
+
+    if (profileError || profile?.role !== "admin") {
+        // Sign out to prevent leaving regular user session in admin flow
+        await supabase.auth.signOut();
+        return { error: "This account does not have administrator access." };
+    }
+
+    redirect("/admin/restaurants");
+}
+
 export async function signUpAction(formData: FormData): Promise<AuthActionResult> {
     const fullName = formData.get("fullName")?.toString().trim();
     const email = formData.get("email")?.toString().trim();

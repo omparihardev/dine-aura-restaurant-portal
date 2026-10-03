@@ -89,7 +89,7 @@ const SIDEBAR_ITEMS = [
     },
 ];
 
-export function PortalSidebar({ user, isOpen, onClose }: PortalSidebarProps) {
+export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarProps) {
     const pathname = usePathname();
 
     const sidebarContent = (
@@ -128,6 +128,27 @@ export function PortalSidebar({ user, isOpen, onClose }: PortalSidebarProps) {
                             </Link>
                         );
                     })}
+
+                    {/* Admin Workspace Link (Visible ONLY to Admin users) */}
+                    {profile?.role === "admin" && (
+                        <div className="pt-3 mt-2 border-t border-zinc-100 dark:border-zinc-800">
+                            <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">
+                                Administration
+                            </p>
+                            <Link
+                                href="/admin/restaurants"
+                                onClick={onClose}
+                                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                                    pathname.startsWith("/admin")
+                                        ? "bg-amber-600 text-white shadow-sm"
+                                        : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-950/80 border border-amber-200/80 dark:border-amber-900/60"
+                                }`}
+                            >
+                                <span className="text-sm">🛡️</span>
+                                <span>Manage Restaurants</span>
+                            </Link>
+                        </div>
+                    )}
                 </nav>
             </div>
 

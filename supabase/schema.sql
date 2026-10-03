@@ -101,7 +101,14 @@ security definer
 set search_path = public
 as $$
 begin
-    if new.role is distinct from old.role and not public.is_admin() then
+    -- Prevent role escalation by normal authenticated users while allowing:
+    -- 1. Existing admins (public.is_admin())
+    -- 2. Supabase service_role operations (auth.role() = 'service_role')
+    -- 3. Direct database administrator executions in SQL Editor (auth.uid() is null)
+    if new.role is distinct from old.role 
+       and auth.uid() is not null
+       and not public.is_admin() 
+       and coalesce(auth.jwt()->>'role', auth.role(), '') <> 'service_role' then
         raise exception 'Users are not permitted to change their own role.';
     end if;
     return new;
@@ -258,3 +265,61 @@ values
     ('Cafe', 'Artisanal coffees, teas, light bites, and contemporary casual fare.'),
     ('Fast Food', 'Quick bites, burgers, wraps, and Indo-Western comfort foods.')
 on conflict (name) do nothing;
+
+-- ==============================================================================
+-- STORAGE: RESTAURANT IMAGES BUCKET & POLICIES
+-- ==============================================================================
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+    'restaurant-images',
+    'restaurant-images',
+    true,
+    5242880,
+    array['image/jpeg', 'image/png', 'image/webp', 'image/jpg']
+)
+on conflict (id) do update set
+    public = true,
+    file_size_limit = 5242880,
+    allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+
+drop policy if exists "Restaurant images are publicly accessible" on storage.objects;
+create policy "Restaurant images are publicly accessible"
+    on storage.objects
+    for select
+    to public
+    using (bucket_id = 'restaurant-images');
+
+drop policy if exists "Admins can upload restaurant images" on storage.objects;
+create policy "Admins can upload restaurant images"
+    on storage.objects
+    for insert
+    to authenticated
+    with check (
+        bucket_id = 'restaurant-images'
+        and public.is_admin()
+    );
+
+drop policy if exists "Admins can update restaurant images" on storage.objects;
+create policy "Admins can update restaurant images"
+    on storage.objects
+    for update
+    to authenticated
+    using (
+        bucket_id = 'restaurant-images'
+        and public.is_admin()
+    )
+    with check (
+        bucket_id = 'restaurant-images'
+        and public.is_admin()
+    );
+
+drop policy if exists "Admins can delete restaurant images" on storage.objects;
+create policy "Admins can delete restaurant images"
+    on storage.objects
+    for delete
+    to authenticated
+    using (
+        bucket_id = 'restaurant-images'
+        and public.is_admin()
+    );
+

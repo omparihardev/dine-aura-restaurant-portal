@@ -270,64 +270,98 @@ export function RestaurantDiscovery({
                     {filteredRestaurants.map((res) => (
                         <article
                             key={res.id}
-                            className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
+                            className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-amber-300 dark:hover:border-amber-900/50 transition-all flex flex-col justify-between"
                         >
                             <div>
-                                {/* Top: Cuisine pill + Rating */}
-                                <div className="flex items-start justify-between gap-2 mb-3">
-                                    <div className="flex flex-wrap items-center gap-1.5">
-                                        <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-900">
+                                {/* Top Image Banner */}
+                                <div className="relative w-full h-44 sm:h-48 bg-gradient-to-br from-amber-100 to-orange-100 dark:from-zinc-800 dark:to-zinc-800/60 overflow-hidden">
+                                    {res.image_url ? (
+                                        <img
+                                            src={res.image_url}
+                                            alt={res.name}
+                                            loading="lazy"
+                                            onError={(e) => {
+                                                const target = e.currentTarget;
+                                                target.style.display = "none";
+                                                const fallback = target.nextElementSibling as HTMLElement;
+                                                if (fallback) fallback.style.display = "flex";
+                                            }}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                                        />
+                                    ) : null}
+
+                                    {/* Fallback pattern / badge if image_url is missing or broken */}
+                                    <div
+                                        className={`w-full h-full items-center justify-center bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-orange-500/10 dark:from-amber-950/30 dark:via-zinc-900 dark:to-orange-950/20 ${
+                                            res.image_url ? "hidden" : "flex"
+                                        }`}
+                                    >
+                                        <div className="flex flex-col items-center justify-center text-center p-4">
+                                            <span className="text-3xl sm:text-4xl mb-1">🍽️</span>
+                                            <span className="text-[11px] font-semibold tracking-wider text-amber-700/80 dark:text-amber-400/80 uppercase">
+                                                {res.cuisine || "DineAura Select"}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Floating Cuisine Pill (Top Left) */}
+                                    <div className="absolute top-3 left-3 flex flex-wrap items-center gap-1.5 z-10">
+                                        <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/95 dark:bg-zinc-900/90 text-amber-800 dark:text-amber-300 shadow-sm backdrop-blur-sm border border-amber-200/50 dark:border-amber-900/50">
                                             {res.cuisine || "Indian Cuisine"}
                                         </span>
-
                                         <span
-                                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
+                                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm backdrop-blur-sm ${
                                                 res.is_active
-                                                    ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
-                                                    : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 border border-zinc-300 dark:border-zinc-700"
+                                                    ? "bg-emerald-500/90 text-white"
+                                                    : "bg-zinc-700/90 text-zinc-200"
                                             }`}
                                         >
                                             {res.is_active ? "Active" : "Inactive"}
                                         </span>
                                     </div>
 
-                                    {/* Star Rating from database */}
-                                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow-sm">
-                                        <span>★</span>
-                                        <span>{res.rating !== null && res.rating !== undefined ? Number(res.rating).toFixed(1) : "New"}</span>
+                                    {/* Floating Star Rating (Top Right) */}
+                                    <div className="absolute top-3 right-3 z-10">
+                                        <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-600 text-white text-xs font-bold shadow-md">
+                                            <span>★</span>
+                                            <span>{res.rating !== null && res.rating !== undefined ? Number(res.rating).toFixed(1) : "New"}</span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Restaurant Title */}
-                                <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100">
-                                    {res.name}
-                                </h3>
+                                {/* Card Body */}
+                                <div className="p-5">
+                                    {/* Restaurant Title */}
+                                    <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                                        {res.name}
+                                    </h3>
 
-                                {/* Description if present */}
-                                {res.description && (
-                                    <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-2 line-clamp-2 leading-relaxed">
-                                        {res.description}
-                                    </p>
-                                )}
-
-                                {/* Location Details: City & State */}
-                                <div className="mt-3 space-y-1 text-xs text-zinc-500 dark:text-zinc-400">
-                                    <p className="flex items-center gap-1.5 font-medium text-zinc-700 dark:text-zinc-300">
-                                        <span>📍</span>
-                                        <span>
-                                            {res.city}, {res.state}
-                                        </span>
-                                    </p>
-                                    {res.address && (
-                                        <p className="text-[11px] text-zinc-500 dark:text-zinc-400 pl-4 truncate">
-                                            {res.address}
+                                    {/* Description if present */}
+                                    {res.description && (
+                                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-2 line-clamp-2 leading-relaxed">
+                                            {res.description}
                                         </p>
                                     )}
+
+                                    {/* Location Details: City & State */}
+                                    <div className="mt-3 space-y-1 text-xs text-zinc-500 dark:text-zinc-400">
+                                        <p className="flex items-center gap-1.5 font-medium text-zinc-700 dark:text-zinc-300">
+                                            <span>📍</span>
+                                            <span>
+                                                {res.city}, {res.state}
+                                            </span>
+                                        </p>
+                                        {res.address && (
+                                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400 pl-4 truncate">
+                                                {res.address}
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Card Footer: Phone + Verified Status */}
-                            <div className="mt-5 pt-3.5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs">
+                            <div className="px-5 pb-5 pt-3.5 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-xs">
                                 <div className="text-zinc-500 dark:text-zinc-400 text-[11px]">
                                     {res.phone ? (
                                         <span className="flex items-center gap-1">
@@ -339,8 +373,9 @@ export function RestaurantDiscovery({
                                     )}
                                 </div>
 
-                                <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
-                                    DineAura Verified
+                                <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                    <span>✨</span>
+                                    <span>DineAura Verified</span>
                                 </span>
                             </div>
                         </article>
