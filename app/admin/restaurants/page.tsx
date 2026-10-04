@@ -34,10 +34,21 @@ export default async function AdminRestaurantsPage() {
     }
 
     // Retrieve all restaurants (active and inactive, allowed under public.is_admin() RLS policy)
-    const { data: restaurants } = await supabase
+    let restaurants: Restaurant[] = [];
+    const { data: rawRestaurants, error: restError } = await supabase
         .from("restaurants")
-        .select("id, name, description, city, state, address, cuisine, image_url, phone, rating, is_active, created_at, updated_at")
+        .select("id, name, description, city, state, address, cuisine, image_url, phone, rating, latitude, longitude, is_active, created_at, updated_at")
         .order("created_at", { ascending: false });
+
+    if (restError && (restError.code === "42703" || restError.message?.includes("latitude"))) {
+        const fallback = await supabase
+            .from("restaurants")
+            .select("id, name, description, city, state, address, cuisine, image_url, phone, rating, is_active, created_at, updated_at")
+            .order("created_at", { ascending: false });
+        restaurants = (fallback.data || []).map((r) => ({ ...r, latitude: null, longitude: null })) as Restaurant[];
+    } else {
+        restaurants = (rawRestaurants as Restaurant[]) || [];
+    }
 
     // Retrieve categories for cuisine selection
     const { data: categories } = await supabase

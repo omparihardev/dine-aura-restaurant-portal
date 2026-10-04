@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { RestaurantDiscovery } from "@/components/portal/restaurant-discovery";
 import type { UserProfile, Restaurant, Category } from "@/lib/types/portal";
 
@@ -8,7 +9,14 @@ export const metadata = {
     description: "Explore India's premier restaurants and manage your DineAura profile.",
 };
 
-export default async function DashboardPage() {
+interface DashboardPageProps {
+    searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+    const resolvedParams = searchParams ? await searchParams : undefined;
+    const cuisineParam = resolvedParams?.cuisine;
+    const initialCuisine = typeof cuisineParam === "string" ? cuisineParam : Array.isArray(cuisineParam) ? cuisineParam[0] : undefined;
     const supabase = await createClient();
     const {
         data: { user },
@@ -28,10 +36,21 @@ export default async function DashboardPage() {
         .maybeSingle<UserProfile>();
 
     // Retrieve real restaurants from public.restaurants (governed by Supabase RLS)
-    const { data: restaurants, error: restaurantsError } = await supabase
+    let restaurants: Restaurant[] = [];
+    const { data: rawRestaurants, error: restaurantsError } = await supabase
         .from("restaurants")
-        .select("id, name, description, city, state, address, cuisine, image_url, phone, rating, is_active, created_at, updated_at")
+        .select("id, name, description, city, state, address, cuisine, image_url, phone, rating, latitude, longitude, is_active, created_at, updated_at")
         .order("created_at", { ascending: false });
+
+    if (restaurantsError && (restaurantsError.code === "42703" || restaurantsError.message?.includes("latitude"))) {
+        const fallback = await supabase
+            .from("restaurants")
+            .select("id, name, description, city, state, address, cuisine, image_url, phone, rating, is_active, created_at, updated_at")
+            .order("created_at", { ascending: false });
+        restaurants = (fallback.data || []).map((r) => ({ ...r, latitude: null, longitude: null })) as Restaurant[];
+    } else {
+        restaurants = (rawRestaurants as Restaurant[]) || [];
+    }
 
     // Retrieve real categories from public.categories
     const { data: categories } = await supabase
@@ -74,11 +93,14 @@ export default async function DashboardPage() {
             </section>
 
             {/* Live Restaurant Discovery & Listings Section (Connected to Supabase) */}
-            <RestaurantDiscovery
-                initialRestaurants={(restaurants as Restaurant[]) || []}
-                initialCategories={(categories as Category[]) || []}
-                initialError={restaurantsError?.message || null}
-            />
+            <Suspense fallback={<div className="p-8 text-center text-zinc-500">Loading restaurants...</div>}>
+                <RestaurantDiscovery
+                    initialRestaurants={(restaurants as Restaurant[]) || []}
+                    initialCategories={(categories as Category[]) || []}
+                    initialError={restaurantsError?.message || null}
+                    initialCuisine={initialCuisine}
+                />
+            </Suspense>
 
             {/* User Profile & Security Details (Preserving existing dashboard functionality) */}
             <section id="profile" className="pt-4 border-t border-zinc-200 dark:border-zinc-800 space-y-6">

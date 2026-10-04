@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import type { UserProfile } from "@/lib/types/portal";
 import { signOutAction } from "@/app/login/actions";
+import { useLocation } from "./location-context";
+import { LocationDropdown } from "./location-dropdown";
 
 interface PortalSidebarProps {
     user?: User | null;
@@ -38,6 +40,24 @@ const SIDEBAR_ITEMS = [
         icon: (
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+        ),
+    },
+    {
+        name: "Favorites",
+        href: "/favorites",
+        icon: (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+        ),
+    },
+    {
+        name: "My Reservations",
+        href: "/reservations",
+        icon: (
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
         ),
     },
@@ -91,6 +111,7 @@ const SIDEBAR_ITEMS = [
 
 export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarProps) {
     const pathname = usePathname();
+    const { locationMode } = useLocation();
 
     const sidebarContent = (
         <div className="h-full flex flex-col justify-between py-6 px-4 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800">
@@ -100,6 +121,22 @@ export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarP
                     <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
                         Menu &bull; Navigation
                     </p>
+                </div>
+
+                {/* Active Global Discovery Location (Drawer) */}
+                <div className="p-3 rounded-2xl bg-zinc-100/80 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/60 space-y-2">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
+                            <span>📍</span>
+                            <span>Discovery Location</span>
+                        </span>
+                        {locationMode === "current" && (
+                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800">
+                                Live GPS
+                            </span>
+                        )}
+                    </div>
+                    <LocationDropdown variant="sidebar" />
                 </div>
 
                 {/* Primary Sidebar Items */}
@@ -131,7 +168,7 @@ export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarP
 
                     {/* Admin Workspace Link (Visible ONLY to Admin users) */}
                     {profile?.role === "admin" && (
-                        <div className="pt-3 mt-2 border-t border-zinc-100 dark:border-zinc-800">
+                        <div className="pt-3 mt-2 border-t border-zinc-100 dark:border-zinc-800 space-y-1">
                             <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">
                                 Administration
                             </p>
@@ -139,13 +176,25 @@ export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarP
                                 href="/admin/restaurants"
                                 onClick={onClose}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                                    pathname.startsWith("/admin")
+                                    pathname.startsWith("/admin/restaurants")
                                         ? "bg-amber-600 text-white shadow-sm"
                                         : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-950/80 border border-amber-200/80 dark:border-amber-900/60"
                                 }`}
                             >
                                 <span className="text-sm">🛡️</span>
                                 <span>Manage Restaurants</span>
+                            </Link>
+                            <Link
+                                href="/admin/reservations"
+                                onClick={onClose}
+                                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                                    pathname.startsWith("/admin/reservations")
+                                        ? "bg-amber-600 text-white shadow-sm"
+                                        : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-950/80 border border-amber-200/80 dark:border-amber-900/60"
+                                }`}
+                            >
+                                <span className="text-sm">📋</span>
+                                <span>Manage Reservations</span>
                             </Link>
                         </div>
                     )}

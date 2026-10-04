@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import type { Restaurant, Category } from "@/lib/types/portal";
 import {
     createRestaurantAction,
@@ -11,6 +12,21 @@ import {
     uploadRestaurantImageAction,
     type RestaurantActionResult,
 } from "@/app/admin/restaurants/actions";
+import { CityCombobox } from "./city-combobox";
+import { CANONICAL_CITIES, normalizeCityName } from "./location-context";
+import { RestaurantImage } from "./restaurant-image";
+
+const RestaurantLocationPicker = dynamic(
+    () => import("./restaurant-location-picker").then((mod) => mod.RestaurantLocationPicker),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="h-48 rounded-2xl bg-zinc-100 dark:bg-zinc-800 animate-pulse flex items-center justify-center text-xs text-zinc-400">
+                Loading interactive map...
+            </div>
+        ),
+    }
+);
 
 interface AdminRestaurantManagerProps {
     initialRestaurants: Restaurant[];
@@ -80,6 +96,12 @@ export function AdminRestaurantManager({
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
 
+    // Coordinates state for Add/Edit modal form
+    const [formLatitude, setFormLatitude] = useState<number | null>(null);
+    const [formLongitude, setFormLongitude] = useState<number | null>(null);
+    const [formCity, setFormCity] = useState<string>("");
+    const [cityError, setCityError] = useState<string | null>(null);
+
     // Derived cuisine and city lists
     const availableCuisines = Array.from(
         new Set([
@@ -92,6 +114,16 @@ export function AdminRestaurantManager({
     const availableCities = Array.from(
         new Set(restaurants.map((r) => r.city).filter((c): c is string => Boolean(c)))
     ).sort();
+
+    // Canonical cities list reusing global location source and any dynamic restaurant cities
+    const availableCanonicalCities = Array.from(
+        new Set([
+            ...CANONICAL_CITIES,
+            ...restaurants
+                .map((r) => normalizeCityName(r.city))
+                .filter((c): c is string => Boolean(c) && c !== "All Metros & Cities"),
+        ])
+    );
 
     // Filtered restaurants
     const filteredRestaurants = restaurants.filter((res) => {
@@ -127,6 +159,10 @@ export function AdminRestaurantManager({
         setSelectedImageFile(null);
         setImagePreviewUrl(null);
         setImageUrlInput("");
+        setFormLatitude(null);
+        setFormLongitude(null);
+        setFormCity("");
+        setCityError(null);
         setIsUploading(false);
         setUploadStatusText("");
         setErrorMessage(null);
@@ -140,6 +176,23 @@ export function AdminRestaurantManager({
         setSelectedImageFile(null);
         setImagePreviewUrl(restaurant.image_url || null);
         setImageUrlInput(restaurant.image_url || "");
+        setFormLatitude(
+            restaurant.latitude !== undefined && restaurant.latitude !== null
+                ? Number(restaurant.latitude)
+                : null
+        );
+        setFormLongitude(
+            restaurant.longitude !== undefined && restaurant.longitude !== null
+                ? Number(restaurant.longitude)
+                : null
+        );
+        const existingCity = (restaurant.city || "").trim();
+        const matchedCanonical =
+            availableCanonicalCities.find(
+                (c) => c.toLowerCase() === existingCity.toLowerCase()
+            ) || existingCity;
+        setFormCity(matchedCanonical);
+        setCityError(null);
         setIsUploading(false);
         setUploadStatusText("");
         setErrorMessage(null);
@@ -199,6 +252,26 @@ export function AdminRestaurantManager({
         const form = event.currentTarget;
         const formData = new FormData(form);
 
+        // Validate City selection against canonical city list
+        const cityValue = formCity.trim();
+        if (!cityValue) {
+            setCityError("City is required.");
+            setErrorMessage("Please select a city from the list.");
+            return;
+        }
+
+        const validCityMatch = availableCanonicalCities.find(
+            (c) => c.toLowerCase() === cityValue.toLowerCase()
+        );
+        if (!validCityMatch) {
+            setCityError("Please select a valid canonical city.");
+            setErrorMessage("Invalid city. Please choose from the available canonical cities.");
+            return;
+        }
+
+        // Set the exact canonical city name into formData
+        formData.set("city", validCityMatch);
+
         // Validate manual URL if provided without file
         const manualUrl = imageUrlInput.trim();
         if (!selectedImageFile && manualUrl) {
@@ -247,6 +320,15 @@ export function AdminRestaurantManager({
         // Set the final resolved image_url (empty string triggers clean nullification in action if intentionally removed)
         formData.set("image_url", finalImageUrl || "");
 
+        // Set the final resolved latitude & longitude
+        if (formLatitude !== null && formLongitude !== null) {
+            formData.set("latitude", formLatitude.toString());
+            formData.set("longitude", formLongitude.toString());
+        } else {
+            formData.set("latitude", "");
+            formData.set("longitude", "");
+        }
+
         startTransition(async () => {
             let result: RestaurantActionResult;
             if (editingRestaurant) {
@@ -267,6 +349,10 @@ export function AdminRestaurantManager({
                 setSelectedImageFile(null);
                 setImagePreviewUrl(null);
                 setImageUrlInput("");
+                setFormLatitude(null);
+                setFormLongitude(null);
+                setFormCity("");
+                setCityError(null);
 
                 if (result.data) {
                     if (editingRestaurant) {
@@ -292,7 +378,7 @@ export function AdminRestaurantManager({
                         setRestaurants((prev) =>
                             prev.map((r) =>
                                 r.id === editingRestaurant.id
-                                    ? { ...r, name, city, state, cuisine, description, address, phone, image_url: finalImageUrl, rating, is_active }
+                                    ? { ...r, name, city, state, cuisine, description, address, phone, image_url: finalImageUrl, rating, latitude: formLatitude, longitude: formLongitude, is_active }
                                     : r
                             )
                         );
@@ -506,27 +592,16 @@ export function AdminRestaurantManager({
                                     >
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-11 h-11 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex-shrink-0 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center text-lg">
-                                                    {res.image_url ? (
-                                                        <>
-                                                            <img
-                                                                src={res.image_url}
-                                                                alt={res.name}
-                                                                className="w-full h-full object-cover"
-                                                                onError={(e) => {
-                                                                    const img = e.currentTarget;
-                                                                    img.style.display = "none";
-                                                                    const fallback = img.nextElementSibling as HTMLElement;
-                                                                    if (fallback) fallback.style.display = "flex";
-                                                                }}
-                                                            />
-                                                            <span className="hidden items-center justify-center w-full h-full text-lg" title="Image unavailable">
-                                                                🍽️
-                                                            </span>
-                                                        </>
-                                                    ) : (
-                                                        <span title="No image uploaded">🍽️</span>
-                                                    )}
+                                                <div className="w-11 h-11 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex-shrink-0 border border-zinc-200 dark:border-zinc-700 relative">
+                                                    <RestaurantImage
+                                                        src={res.image_url}
+                                                        alt={res.name}
+                                                        fill
+                                                        className="object-cover"
+                                                        sizes="44px"
+                                                        fallbackCuisine={res.cuisine}
+                                                        compactFallback
+                                                    />
                                                 </div>
                                                 <div>
                                                     <div className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">
@@ -554,6 +629,12 @@ export function AdminRestaurantManager({
                                                     {res.address}
                                                 </div>
                                             )}
+                                            {res.latitude !== null && res.latitude !== undefined && res.longitude !== null && res.longitude !== undefined ? (
+                                                <div className="text-[10px] text-amber-700 dark:text-amber-400 font-mono font-medium flex items-center gap-1 mt-0.5">
+                                                    <span>📍</span>
+                                                    <span>{Number(res.latitude).toFixed(4)}, {Number(res.longitude).toFixed(4)}</span>
+                                                </div>
+                                            ) : null}
                                         </td>
                                         <td className="px-4 py-4">
                                             <span className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400">
@@ -712,18 +793,25 @@ export function AdminRestaurantManager({
                                 </div>
 
                                 <div>
-                                    <label htmlFor="city" className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
+                                    <label htmlFor="city-trigger" className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                                         City <span className="text-red-500">*</span>
                                     </label>
-                                    <input
+                                    <CityCombobox
                                         id="city"
                                         name="city"
-                                        type="text"
+                                        value={formCity}
+                                        onChange={(val) => {
+                                            setFormCity(val);
+                                            if (cityError) setCityError(null);
+                                        }}
+                                        availableCities={availableCanonicalCities}
                                         required
-                                        defaultValue={editingRestaurant?.city || ""}
-                                        placeholder="e.g. Bengaluru"
-                                        className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                        error={cityError}
+                                        placeholder="Select a city..."
                                     />
+                                    {cityError && (
+                                        <p className="mt-1 text-xs text-red-500 font-medium">{cityError}</p>
+                                    )}
                                 </div>
 
                                 <div>
@@ -775,6 +863,21 @@ export function AdminRestaurantManager({
                                     />
                                 </div>
 
+                                {/* Restaurant Location Picker (Mutually Exclusive Map vs Manual Coordinates) */}
+                                <div className="sm:col-span-2">
+                                    <RestaurantLocationPicker
+                                        key={editingRestaurant ? `edit-${editingRestaurant.id}-${editingRestaurant.latitude ?? "none"}-${editingRestaurant.longitude ?? "none"}` : "add-new"}
+                                        initialLatitude={formLatitude}
+                                        initialLongitude={formLongitude}
+                                        city={editingRestaurant?.city}
+                                        state={editingRestaurant?.state}
+                                        onCoordinatesChange={(lat, lng) => {
+                                            setFormLatitude(lat);
+                                            setFormLongitude(lng);
+                                        }}
+                                    />
+                                </div>
+
                                 <div className="sm:col-span-2 space-y-3 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/60">
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -800,14 +903,12 @@ export function AdminRestaurantManager({
                                     {/* Preview Box or Upload Dropzone */}
                                     {imagePreviewUrl ? (
                                         <div className="relative rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-700 bg-zinc-950 aspect-video max-h-48 group">
-                                            <img
+                                            <RestaurantImage
                                                 src={imagePreviewUrl}
                                                 alt="Restaurant Preview"
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    // Fallback placeholder if remote image link is broken
-                                                    (e.target as HTMLElement).classList.add("hidden");
-                                                }}
+                                                fill
+                                                className="object-cover"
+                                                fallbackSubtitle="Preview unavailable"
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end justify-between p-3.5">
                                                 <div className="text-white text-xs max-w-[70%]">

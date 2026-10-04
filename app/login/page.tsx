@@ -14,9 +14,9 @@ export default async function LoginPage() {
         data: { user },
     } = await supabase.auth.getUser();
 
-    // Redirect already authenticated users directly to dashboard
+    // Redirect already authenticated users directly to Home Page
     if (user) {
-        redirect("/dashboard");
+        redirect("/");
     }
 
     return (

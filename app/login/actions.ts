@@ -27,7 +27,7 @@ export async function signInAction(formData: FormData): Promise<AuthActionResult
         return { error: error.message };
     }
 
-    redirect("/dashboard");
+    redirect("/");
 }
 
 export async function adminSignInAction(formData: FormData): Promise<AuthActionResult> {
@@ -105,7 +105,7 @@ export async function signUpAction(formData: FormData): Promise<AuthActionResult
         };
     }
 
-    redirect("/dashboard");
+    redirect("/");
 }
 
 export async function signOutAction(): Promise<void> {

@@ -56,6 +56,9 @@ export default function AuthForm() {
                     setErrorMessage(result.error);
                 } else if (result?.message) {
                     setSuccessMessage(result.message);
+                    if (result?.success && mode === "signup") {
+                        setMode("signin");
+                    }
                 }
             } catch (err: unknown) {
                 // Next.js redirect throws a special NEXT_REDIRECT error which shouldn't be caught as an error

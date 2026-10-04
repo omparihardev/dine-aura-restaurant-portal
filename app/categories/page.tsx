@@ -70,7 +70,7 @@ export default async function CategoriesPage() {
 
                                 <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800">
                                     <Link
-                                        href={`/#discover`}
+                                        href={`/?cuisine=${encodeURIComponent(cat.name)}#discover`}
                                         className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
                                     >
                                         <span>View restaurants</span>

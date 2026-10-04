@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import type { UserProfile } from "@/lib/types/portal";
 import { signOutAction } from "@/app/login/actions";
+import { useLocation } from "./location-context";
+import { LocationDropdown } from "./location-dropdown";
 
 interface PortalHeaderProps {
     user?: User | null;
@@ -22,6 +24,8 @@ interface PortalHeaderProps {
 // - Profile
 const NAVBAR_ITEMS = [
     { name: "Home", href: "/" },
+    { name: "Favorites", href: "/favorites" },
+    { name: "My Reservations", href: "/reservations" },
     { name: "About", href: "/about" },
     { name: "Services", href: "/services" },
     { name: "Categories", href: "/categories" },
@@ -29,22 +33,9 @@ const NAVBAR_ITEMS = [
     { name: "Profile", href: "/profile" },
 ];
 
-const INDIAN_CITIES = [
-    "Bengaluru, Karnataka",
-    "Mumbai, Maharashtra",
-    "Delhi NCR",
-    "Hyderabad, Telangana",
-    "Pune, Maharashtra",
-    "Kolkata, West Bengal",
-    "Chennai, Tamil Nadu",
-    "Jaipur, Rajasthan",
-    "Ahmedabad, Gujarat",
-    "Lucknow, Uttar Pradesh",
-];
-
 export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps) {
     const pathname = usePathname();
-    const [selectedCity, setSelectedCity] = useState("Bengaluru, Karnataka");
+    const { locationError, clearLocationError } = useLocation();
 
     const displayName =
         profile?.full_name ||
@@ -113,37 +104,59 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                     })}
 
                     {profile?.role === "admin" && (
-                        <Link
-                            href="/admin/restaurants"
-                            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
-                                pathname.startsWith("/admin")
-                                    ? "bg-amber-600 text-white shadow-sm"
-                                    : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-900 hover:bg-amber-100"
-                            }`}
-                        >
-                            <span>🛡️ Admin</span>
-                        </Link>
+                        <div className="flex items-center gap-1 pl-1 border-l border-zinc-200 dark:border-zinc-700">
+                            <Link
+                                href="/admin/restaurants"
+                                title="Manage Restaurants"
+                                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 ${
+                                    pathname.startsWith("/admin/restaurants")
+                                        ? "bg-amber-600 text-white shadow-sm"
+                                        : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-900 hover:bg-amber-100"
+                                }`}
+                            >
+                                <span>🛡️ Restaurants</span>
+                            </Link>
+                            <Link
+                                href="/admin/reservations"
+                                title="Manage Reservations"
+                                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 ${
+                                    pathname.startsWith("/admin/reservations")
+                                        ? "bg-amber-600 text-white shadow-sm"
+                                        : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-900 hover:bg-amber-100"
+                                }`}
+                            >
+                                <span>📋 Reservations</span>
+                            </Link>
+                        </div>
                     )}
                 </nav>
 
-                {/* Right section: City selector + User Profile / Auth State */}
-                <div className="flex items-center gap-3">
-                    {/* Location selector (compact) */}
-                    <div className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-700 dark:text-zinc-300">
-                        <span className="text-amber-600">📍</span>
-                        <select
-                            value={selectedCity}
-                            onChange={(e) => setSelectedCity(e.target.value)}
-                            aria-label="Filter city"
-                            className="bg-transparent text-xs font-semibold focus:outline-none cursor-pointer text-zinc-800 dark:text-zinc-200"
+                {/* Right section: Global Location selector + User Profile / Auth State */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                    {/* Global Location selector (Single source of truth) */}
+                    <LocationDropdown variant="navbar" align="right" />
+
+                    {/* Non-intrusive Geolocation Notification */}
+                    {locationError && (
+                        <div
+                            role="status"
+                            aria-live="polite"
+                            className="fixed top-18 right-4 max-w-sm p-3 rounded-xl bg-amber-50 dark:bg-amber-950/90 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs shadow-lg flex items-center justify-between gap-3 z-50 animate-in fade-in slide-in-from-top-2"
                         >
-                            {INDIAN_CITIES.map((city) => (
-                                <option key={city} value={city} className="bg-white dark:bg-zinc-900">
-                                    {city.split(",")[0]}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm">⚠️</span>
+                                <span>{locationError}</span>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={clearLocationError}
+                                aria-label="Dismiss location message"
+                                className="text-amber-700 dark:text-amber-400 hover:text-amber-950 dark:hover:text-amber-100 font-bold text-sm px-1 cursor-pointer"
+                            >
+                                &times;
+                            </button>
+                        </div>
+                    )}
 
                     {user ? (
                         <>

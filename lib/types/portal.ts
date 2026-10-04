@@ -14,6 +14,7 @@ export interface UserProfile {
 export interface PortalShellProps {
     user?: User | null;
     profile?: UserProfile | null;
+    initialCity?: string;
     children: React.ReactNode;
 }
 
@@ -36,6 +37,8 @@ export interface Restaurant {
     image_url: string | null;
     phone: string | null;
     rating: number | null;
+    latitude?: number | null;
+    longitude?: number | null;
     is_active: boolean;
     created_at: string;
     updated_at: string;
@@ -47,3 +50,50 @@ export interface Category {
     description?: string | null;
     created_at?: string;
 }
+
+export type ReservationStatus = "pending" | "confirmed" | "declined" | "cancelled" | "completed";
+
+export type SeatingPreference =
+    | "No Preference"
+    | "Indoor"
+    | "Outdoor"
+    | "Family Area"
+    | "Private Dining";
+
+export interface Reservation {
+    id: string;
+    restaurant_id: string;
+    user_id: string;
+    customer_name: string;
+    customer_phone: string;
+    reservation_date: string;
+    reservation_time: string;
+    party_size: number;
+    seating_preference: string | null;
+    special_request: string | null;
+    status: ReservationStatus;
+    created_at: string;
+    updated_at: string;
+    // Optional joined restaurant details
+    restaurant?: {
+        id?: string;
+        name: string;
+        city?: string;
+        state?: string;
+        cuisine?: string;
+        image_url?: string | null;
+        phone?: string | null;
+        address?: string | null;
+    } | null;
+    restaurants?: {
+        id?: string;
+        name: string;
+        city?: string;
+        state?: string;
+        cuisine?: string;
+        image_url?: string | null;
+        phone?: string | null;
+        address?: string | null;
+    } | null;
+}
+

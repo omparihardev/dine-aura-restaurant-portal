@@ -9,6 +9,7 @@ import { PortalSidebar } from "./portal-sidebar";
 interface PortalShellProps {
     user?: User | null;
     profile?: UserProfile | null;
+    initialCity?: string;
     children: React.ReactNode;
 }
 
@@ -17,12 +18,12 @@ export function PortalShell({ user, profile, children }: PortalShellProps) {
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col">
-            {/* Top Navigation Bar */}
-            <PortalHeader
-                user={user}
-                profile={profile}
-                onMenuToggle={() => setIsSidebarOpen((prev) => !prev)}
-            />
+                {/* Top Navigation Bar */}
+                <PortalHeader
+                    user={user}
+                    profile={profile}
+                    onMenuToggle={() => setIsSidebarOpen((prev) => !prev)}
+                />
 
             {/* Sidebar (Desktop sticky + Mobile slide-out drawer) */}
             <PortalSidebar

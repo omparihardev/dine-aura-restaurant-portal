@@ -7,7 +7,7 @@ export interface RestaurantActionResult {
     error?: string;
     success?: boolean;
     message?: string;
-    data?: any;
+    data?: unknown;
 }
 
 // Helper: Ensure the current user is authenticated and has admin privileges
@@ -77,6 +77,27 @@ export async function createRestaurantAction(formData: FormData): Promise<Restau
             return { error: "Please enter a valid 10-digit Indian phone number (e.g. +91 98765 43210 or 9876543210)." };
         }
 
+        // Geographic coordinates validation (latitude & longitude)
+        const latitudeRaw = formData.get("latitude")?.toString().trim();
+        const longitudeRaw = formData.get("longitude")?.toString().trim();
+        let latitude: number | null = null;
+        let longitude: number | null = null;
+
+        if (latitudeRaw || longitudeRaw) {
+            if (!latitudeRaw || !longitudeRaw) {
+                return { error: "Both latitude and longitude must be provided together." };
+            }
+            latitude = parseFloat(latitudeRaw);
+            longitude = parseFloat(longitudeRaw);
+
+            if (isNaN(latitude) || latitude < -90 || latitude > 90) {
+                return { error: "Latitude must be a valid number between -90 and 90." };
+            }
+            if (isNaN(longitude) || longitude < -180 || longitude > 180) {
+                return { error: "Longitude must be a valid number between -180 and 180." };
+            }
+        }
+
         const { data: insertedData, error: insertError } = await supabase
             .from("restaurants")
             .insert({
@@ -89,6 +110,8 @@ export async function createRestaurantAction(formData: FormData): Promise<Restau
                 image_url,
                 phone,
                 rating,
+                latitude,
+                longitude,
                 is_active,
             })
             .select()
@@ -153,7 +176,28 @@ export async function updateRestaurantAction(
             return { error: "Please enter a valid 10-digit Indian phone number (e.g. +91 98765 43210 or 9876543210)." };
         }
 
-        const updatePayload: Record<string, any> = {
+        // Geographic coordinates validation (latitude & longitude)
+        const latitudeRaw = formData.get("latitude")?.toString().trim();
+        const longitudeRaw = formData.get("longitude")?.toString().trim();
+        let latitude: number | null = null;
+        let longitude: number | null = null;
+
+        if (latitudeRaw || longitudeRaw) {
+            if (!latitudeRaw || !longitudeRaw) {
+                return { error: "Both latitude and longitude must be provided together." };
+            }
+            latitude = parseFloat(latitudeRaw);
+            longitude = parseFloat(longitudeRaw);
+
+            if (isNaN(latitude) || latitude < -90 || latitude > 90) {
+                return { error: "Latitude must be a valid number between -90 and 90." };
+            }
+            if (isNaN(longitude) || longitude < -180 || longitude > 180) {
+                return { error: "Longitude must be a valid number between -180 and 180." };
+            }
+        }
+
+        const updatePayload: Record<string, string | number | boolean | null> = {
             name,
             city,
             state,
@@ -162,6 +206,8 @@ export async function updateRestaurantAction(
             address,
             phone,
             rating,
+            latitude,
+            longitude,
             is_active,
         };
 
