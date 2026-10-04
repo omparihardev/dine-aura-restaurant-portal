@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export interface AuthActionResult {
@@ -106,6 +107,49 @@ export async function signUpAction(formData: FormData): Promise<AuthActionResult
     }
 
     redirect("/");
+}
+
+export async function forgotPasswordAction(formData: FormData): Promise<AuthActionResult> {
+    const email = formData.get("email")?.toString().trim();
+
+    if (!email) {
+        return { error: "Please enter your email address." };
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return { error: "Please enter a valid email address." };
+    }
+
+    try {
+        const headerList = await headers();
+        const originHeader = headerList.get("origin");
+        const hostHeader = headerList.get("host");
+        const protoHeader = headerList.get("x-forwarded-proto") || "http";
+        const origin =
+            originHeader ||
+            (hostHeader ? `${protoHeader}://${hostHeader}` : "") ||
+            process.env.NEXT_PUBLIC_SITE_URL ||
+            "http://localhost:3000";
+
+        const supabase = await createClient();
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${origin}/auth/callback?next=/reset-password`,
+        });
+
+        if (error) {
+            return { error: error.message };
+        }
+
+        return {
+            success: true,
+            message: "If an account exists for this email, we've sent a password reset link.",
+        };
+    } catch {
+        return {
+            error: "Unable to process password reset request. Please try again later.",
+        };
+    }
 }
 
 export async function signOutAction(): Promise<void> {

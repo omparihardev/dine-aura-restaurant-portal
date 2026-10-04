@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
+import Link from "next/link";
 import {
     signInAction,
     adminSignInAction,
@@ -11,11 +12,57 @@ import {
 export default function AuthForm() {
     const [portalType, setPortalType] = useState<"user" | "admin">("user");
     const [mode, setMode] = useState<"signin" | "signup">("signin");
+    const [email, setEmail] = useState<string>("");
+    const [rememberMe, setRememberMe] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isPending, startTransition] = useTransition();
+
+    // Client-side initialization of Remember Me state from localStorage
+    useEffect(() => {
+        try {
+            const savedEmail = localStorage.getItem("dineaura_remembered_email");
+            if (savedEmail) {
+                setEmail(savedEmail);
+                setRememberMe(true);
+            }
+        } catch {
+            // Ignore storage exceptions (e.g., privacy/quota restrictions)
+        }
+    }, []);
+
+    function handleRememberMeChange(checked: boolean) {
+        setRememberMe(checked);
+        try {
+            if (checked) {
+                if (email.trim()) {
+                    localStorage.setItem("dineaura_remembered_email", email.trim());
+                }
+            } else {
+                localStorage.removeItem("dineaura_remembered_email");
+            }
+        } catch {
+            // Ignore storage exceptions
+        }
+    }
+
+    function handleEmailChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const newEmail = event.target.value;
+        setEmail(newEmail);
+        if (rememberMe && portalType === "user" && mode === "signin") {
+            try {
+                if (newEmail.trim()) {
+                    localStorage.setItem("dineaura_remembered_email", newEmail.trim());
+                } else {
+                    localStorage.removeItem("dineaura_remembered_email");
+                }
+            } catch {
+                // Ignore storage exceptions
+            }
+        }
+    }
 
     function handlePortalTypeChange(newPortalType: "user" | "admin") {
         setPortalType(newPortalType);
@@ -40,6 +87,22 @@ export default function AuthForm() {
         setSuccessMessage(null);
 
         const formData = new FormData(event.currentTarget);
+
+        // Ensure remembered email is persisted or cleared strictly for User Sign-In
+        if (portalType === "user" && mode === "signin") {
+            try {
+                if (rememberMe) {
+                    const currentEmail = formData.get("email")?.toString().trim();
+                    if (currentEmail) {
+                        localStorage.setItem("dineaura_remembered_email", currentEmail);
+                    }
+                } else {
+                    localStorage.removeItem("dineaura_remembered_email");
+                }
+            } catch {
+                // Ignore storage exceptions
+            }
+        }
 
         startTransition(async () => {
             try {
@@ -228,6 +291,8 @@ export default function AuthForm() {
                         name="email"
                         type="email"
                         required
+                        value={email}
+                        onChange={handleEmailChange}
                         placeholder={
                             portalType === "admin"
                                 ? "admin@dineaura.in"
@@ -304,6 +369,31 @@ export default function AuthForm() {
                         </button>
                     </div>
                 </div>
+
+                {portalType === "user" && mode === "signin" && (
+                    <div className="flex items-center justify-between pt-1">
+                        <label
+                            htmlFor="rememberMe"
+                            className="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400 select-none cursor-pointer"
+                        >
+                            <input
+                                id="rememberMe"
+                                name="rememberMe"
+                                type="checkbox"
+                                checked={rememberMe}
+                                onChange={(e) => handleRememberMeChange(e.target.checked)}
+                                className="w-4 h-4 rounded border-zinc-300 dark:border-zinc-700 text-amber-600 focus:ring-amber-500 focus:ring-offset-0 transition-colors cursor-pointer accent-amber-600"
+                            />
+                            <span className="font-medium">Remember Me</span>
+                        </label>
+                        <Link
+                            href="/forgot-password"
+                            className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline transition-colors"
+                        >
+                            Forgot Password?
+                        </Link>
+                    </div>
+                )}
 
                 {portalType === "user" && mode === "signup" && (
                     <div>
