@@ -5,12 +5,16 @@ import Link from "next/link";
 import { RestaurantImage } from "./restaurant-image";
 import type { User } from "@supabase/supabase-js";
 import type { Restaurant, UserProfile } from "@/lib/types/portal";
+import type { RestaurantMenuItem } from "@/lib/types/menu";
 import { createReservationAction } from "@/app/reservations/actions";
+import { RestaurantMenuView } from "./restaurant-menu-view";
 
 interface RestaurantDetailsViewProps {
     restaurant: Restaurant;
     user?: User | null;
     profile?: UserProfile | null;
+    menuItems?: RestaurantMenuItem[];
+    menuError?: string | null;
 }
 
 const SEATING_PREFERENCES = [
@@ -41,6 +45,8 @@ export function RestaurantDetailsView({
     restaurant,
     user,
     profile,
+    menuItems = [],
+    menuError = null,
 }: RestaurantDetailsViewProps) {
     const [isFavorite, setIsFavorite] = useState(false);
     const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -299,6 +305,15 @@ export function RestaurantDetailsView({
                         <span>Back to Restaurants</span>
                     </Link>
 
+                    <a
+                        href="#restaurant-menu"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-200/80 dark:border-amber-900/60 text-xs font-semibold text-amber-800 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all shadow-sm"
+                        title="Jump to Restaurant Menu"
+                    >
+                        <span>📋</span>
+                        <span>Menu</span>
+                    </a>
+
                     <button
                         type="button"
                         onClick={handleShare}
@@ -474,6 +489,13 @@ export function RestaurantDetailsView({
                             </span>
                         </div>
                     </section>
+
+                    {/* Customer-Facing Restaurant Menu Section */}
+                    <RestaurantMenuView
+                        menuItems={menuItems}
+                        error={menuError}
+                        restaurantName={restaurant.name}
+                    />
 
                     {/* Location & Contact Information Card */}
                     <section className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-5">

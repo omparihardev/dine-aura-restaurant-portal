@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, useRef } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import type { Restaurant, Category } from "@/lib/types/portal";
@@ -663,6 +664,14 @@ export function AdminRestaurantManager({
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
+                                                <Link
+                                                    href={`/admin/restaurants/${res.id}/menu`}
+                                                    title={`Manage menu items for ${res.name}`}
+                                                    className="px-3 py-1.5 rounded-lg text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900/60 border border-amber-200/80 dark:border-amber-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+                                                >
+                                                    <span>📜</span>
+                                                    <span>Menu</span>
+                                                </Link>
                                                 <button
                                                     type="button"
                                                     onClick={() => handleOpenEdit(res)}

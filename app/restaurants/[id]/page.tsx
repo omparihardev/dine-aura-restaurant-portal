@@ -4,6 +4,7 @@ import { RestaurantDetailsView } from "@/components/portal/restaurant-details-vi
 import Link from "next/link";
 import type { Metadata } from "next";
 import type { UserProfile, Restaurant } from "@/lib/types/portal";
+import type { RestaurantMenuItem } from "@/lib/types/menu";
 
 interface RestaurantPageProps {
     params: Promise<{ id: string }>;
@@ -165,12 +166,38 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
         );
     }
 
+    // Fetch customer-facing menu items (available only, ordered by category and name)
+    let menuItems: RestaurantMenuItem[] = [];
+    let menuError: string | null = null;
+
+    try {
+        const { data: menuData, error: menuQueryError } = await supabase
+            .from("restaurant_menu_items")
+            .select("id, restaurant_id, name, description, category, price, is_available, created_at, updated_at")
+            .eq("restaurant_id", id)
+            .eq("is_available", true)
+            .order("category", { ascending: true })
+            .order("name", { ascending: true });
+
+        if (menuQueryError) {
+            console.error("Menu query error for restaurant:", id, menuQueryError.message);
+            menuError = menuQueryError.message;
+        } else if (menuData) {
+            menuItems = menuData as RestaurantMenuItem[];
+        }
+    } catch (err: unknown) {
+        console.error("Unexpected error fetching restaurant menu:", err);
+        menuError = err instanceof Error ? err.message : "Failed to load menu";
+    }
+
     return (
         <PortalShell user={user} profile={profile}>
             <RestaurantDetailsView
                 restaurant={restaurant}
                 user={user}
                 profile={profile}
+                menuItems={menuItems}
+                menuError={menuError}
             />
         </PortalShell>
     );
