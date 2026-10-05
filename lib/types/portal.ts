@@ -15,6 +15,7 @@ export interface PortalShellProps {
     user?: User | null;
     profile?: UserProfile | null;
     initialCity?: string;
+    initialSearch?: string;
     children: React.ReactNode;
 }
 

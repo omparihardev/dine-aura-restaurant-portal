@@ -9,6 +9,7 @@ import { useLocation } from "./location-context";
 import { LocationDropdown } from "./location-dropdown";
 import { RestaurantImage } from "./restaurant-image";
 import { calculateDistanceKm, formatDistance } from "@/lib/utils/distance";
+import { usePortalSearch } from "./search-context";
 
 interface RestaurantDiscoveryProps {
     initialRestaurants?: Restaurant[];
@@ -70,8 +71,12 @@ export function RestaurantDiscovery({
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(initialError);
 
+    const portalSearch = usePortalSearch();
+    const [localSearchFilter, setLocalSearchFilter] = useState<string>("");
+
+    const searchFilter = portalSearch ? portalSearch.searchQuery : localSearchFilter;
+    const setSearchFilter = portalSearch ? portalSearch.setSearchQuery : setLocalSearchFilter;
     const [selectedCuisine, setSelectedCuisine] = useState<string>(initialMatchedCuisine);
-    const [searchFilter, setSearchFilter] = useState<string>("");
     const [ratingFilter, setRatingFilter] = useState<string>("All Ratings");
     const [sortOption, setSortOption] = useState<string>("Recommended");
 
@@ -101,6 +106,14 @@ export function RestaurantDiscovery({
             setSelectedCuisine(canonical);
         } else if (urlCuisine === null && searchParams) {
             setSelectedCuisine("All Cuisines");
+        }
+    }, [searchParams]);
+
+    // Synchronize searchFilter when URL query parameter changes
+    useEffect(() => {
+        const urlSearch = searchParams?.get("search");
+        if (urlSearch !== null && urlSearch !== undefined) {
+            setSearchFilter(urlSearch);
         }
     }, [searchParams]);
 
@@ -158,13 +171,18 @@ export function RestaurantDiscovery({
 
     function handleClearFilters() {
         setSelectedCuisine("All Cuisines");
-        setSearchFilter("");
+        if (portalSearch) {
+            portalSearch.clearSearch();
+        } else {
+            setSearchFilter("");
+        }
         setRatingFilter("All Ratings");
         setSortOption(locationMode === "current" ? "Nearest First" : "Recommended");
         // Preserve selectedCity / locationMode: Global location is a standing setting per Requirement 8 & 12
         if (typeof window !== "undefined" && window.history.replaceState) {
             const url = new URL(window.location.href);
             url.searchParams.delete("cuisine");
+            url.searchParams.delete("search");
             if (locationMode !== "current" && selectedCity && selectedCity !== "All Metros & Cities") {
                 url.searchParams.set("city", selectedCity);
             } else {
@@ -339,6 +357,7 @@ export function RestaurantDiscovery({
                             </svg>
                         </span>
                         <input
+                            id="discovery-search-input"
                             type="text"
                             value={searchFilter}
                             onChange={(e) => setSearchFilter(e.target.value)}
@@ -349,7 +368,13 @@ export function RestaurantDiscovery({
                         {searchFilter && (
                             <button
                                 type="button"
-                                onClick={() => setSearchFilter("")}
+                                onClick={() => {
+                                    if (portalSearch) {
+                                        portalSearch.clearSearch();
+                                    } else {
+                                        setSearchFilter("");
+                                    }
+                                }}
                                 title="Clear search text"
                                 aria-label="Clear search text"
                                 className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"

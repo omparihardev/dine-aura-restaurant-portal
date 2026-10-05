@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import type { UserProfile } from "@/lib/types/portal";
 import { signOutAction } from "@/app/login/actions";
 import { useLocation } from "./location-context";
 import { LocationDropdown } from "./location-dropdown";
+import { usePortalSearch } from "./search-context";
 
 interface PortalHeaderProps {
     user?: User | null;
@@ -35,7 +36,105 @@ const NAVBAR_ITEMS = [
 
 export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps) {
     const pathname = usePathname();
+    const router = useRouter();
     const { locationError, clearLocationError } = useLocation();
+    const portalSearch = usePortalSearch();
+
+    const searchQuery = portalSearch?.searchQuery ?? "";
+    const setSearchQuery = portalSearch?.setSearchQuery ?? (() => {});
+    const clearSearch = portalSearch?.clearSearch ?? (() => {});
+
+    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+    const desktopSearchInputRef = useRef<HTMLInputElement>(null);
+    const mobileSearchInputRef = useRef<HTMLInputElement>(null);
+
+    // Scroll to discovery section smoothly on home page
+    function scrollToDiscovery() {
+        if (typeof window === "undefined") return;
+        const discoverEl = document.getElementById("discover");
+        if (discoverEl) {
+            discoverEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    }
+
+    // Handle real-time typing in Header Search
+    function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>) {
+        const value = e.target.value;
+        setSearchQuery(value);
+
+        // If on Home page and user starts typing, gently scroll to discovery section if needed
+        if (pathname === "/" && value.trim().length > 0) {
+            if (typeof window !== "undefined") {
+                const discoverEl = document.getElementById("discover");
+                if (discoverEl) {
+                    const rect = discoverEl.getBoundingClientRect();
+                    if (rect.top > window.innerHeight) {
+                        discoverEl.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                }
+            }
+        }
+    }
+
+    // Handle form submit / Enter key press
+    function handleSearchSubmit(e?: React.FormEvent) {
+        if (e) e.preventDefault();
+
+        if (pathname === "/") {
+            scrollToDiscovery();
+            if (isMobileSearchOpen) {
+                setIsMobileSearchOpen(false);
+            }
+            // Update URL search param on Home page for shareability / persistence
+            if (typeof window !== "undefined" && window.history.replaceState) {
+                const url = new URL(window.location.href);
+                if (searchQuery.trim()) {
+                    url.searchParams.set("search", searchQuery.trim());
+                } else {
+                    url.searchParams.delete("search");
+                }
+                window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+            }
+        } else {
+            const query = searchQuery.trim();
+            const target = query
+                ? `/?search=${encodeURIComponent(query)}#discover`
+                : "/#discover";
+            router.push(target);
+            if (isMobileSearchOpen) {
+                setIsMobileSearchOpen(false);
+            }
+        }
+    }
+
+    // Keyboard shortcut '/' to quickly focus search; Escape to clear or close
+    useEffect(() => {
+        function handleKeyDown(e: KeyboardEvent) {
+            const target = e.target as HTMLElement | null;
+            const isTyping =
+                target?.tagName === "INPUT" ||
+                target?.tagName === "TEXTAREA" ||
+                target?.tagName === "SELECT" ||
+                target?.isContentEditable;
+
+            if (e.key === "/" && !isTyping) {
+                e.preventDefault();
+                if (window.innerWidth < 768) {
+                    setIsMobileSearchOpen(true);
+                    setTimeout(() => mobileSearchInputRef.current?.focus(), 50);
+                } else {
+                    desktopSearchInputRef.current?.focus();
+                    desktopSearchInputRef.current?.select();
+                }
+            } else if (e.key === "Escape") {
+                if (isMobileSearchOpen) {
+                    setIsMobileSearchOpen(false);
+                }
+            }
+        }
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [isMobileSearchOpen]);
 
     const displayName =
         profile?.full_name ||
@@ -83,10 +182,11 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                     className="hidden xl:flex items-center gap-1.5 bg-zinc-100/80 dark:bg-zinc-800/60 p-1 rounded-xl border border-zinc-200/80 dark:border-zinc-700/60"
                 >
                     {NAVBAR_ITEMS.map((item) => {
+                        const currentPath = pathname || "/";
                         const isActive =
                             item.href === "/"
-                                ? pathname === "/"
-                                : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                                ? currentPath === "/"
+                                : currentPath === item.href || currentPath.startsWith(`${item.href}/`);
 
                         return (
                             <Link
@@ -109,7 +209,7 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                                 href="/admin/restaurants"
                                 title="Manage Restaurants"
                                 className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 ${
-                                    pathname.startsWith("/admin/restaurants")
+                                    (pathname || "").startsWith("/admin/restaurants")
                                         ? "bg-amber-600 text-white shadow-sm"
                                         : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-900 hover:bg-amber-100"
                                 }`}
@@ -120,7 +220,7 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                                 href="/admin/reservations"
                                 title="Manage Reservations"
                                 className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 ${
-                                    pathname.startsWith("/admin/reservations")
+                                    (pathname || "").startsWith("/admin/reservations")
                                         ? "bg-amber-600 text-white shadow-sm"
                                         : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-900 hover:bg-amber-100"
                                 }`}
@@ -131,8 +231,74 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                     )}
                 </nav>
 
-                {/* Right section: Global Location selector + User Profile / Auth State */}
+                {/* Right section: Search + Global Location selector + User Profile / Auth State */}
                 <div className="flex items-center gap-2 sm:gap-3">
+                    {/* Functional BRD Header Search Control */}
+                    <div className="flex items-center">
+                        {/* Real Desktop & Tablet Search Input */}
+                        <form
+                            onSubmit={handleSearchSubmit}
+                            className="hidden md:flex relative items-center"
+                            role="search"
+                        >
+                            <label htmlFor="portal-header-search" className="sr-only">
+                                Search restaurants across India
+                            </label>
+                            <span className="absolute left-2.5 flex items-center pointer-events-none text-zinc-400">
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </span>
+                            <input
+                                ref={desktopSearchInputRef}
+                                id="portal-header-search"
+                                type="text"
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Escape") {
+                                        if (searchQuery) clearSearch();
+                                        else desktopSearchInputRef.current?.blur();
+                                    }
+                                }}
+                                placeholder="Search restaurants..."
+                                aria-label="Search restaurants across India"
+                                className="w-36 md:w-44 lg:w-48 xl:w-52 2xl:w-64 pl-8 pr-7 py-1.5 text-xs rounded-xl bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200/80 dark:border-zinc-700/60 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
+                            />
+                            {searchQuery ? (
+                                <button
+                                    type="button"
+                                    onClick={clearSearch}
+                                    title="Clear search"
+                                    aria-label="Clear search"
+                                    className="absolute right-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 p-0.5 cursor-pointer text-xs"
+                                >
+                                    <span className="font-bold">&times;</span>
+                                </button>
+                            ) : (
+                                <kbd className="hidden lg:inline-flex items-center absolute right-2 px-1.5 py-0.5 text-[10px] font-mono rounded bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 text-zinc-400 pointer-events-none shadow-2xs">
+                                    /
+                                </kbd>
+                            )}
+                        </form>
+
+                        {/* Mobile Search Icon Button */}
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setIsMobileSearchOpen(true);
+                                setTimeout(() => mobileSearchInputRef.current?.focus(), 50);
+                            }}
+                            title="Search restaurants"
+                            aria-label="Open mobile search"
+                            className="md:hidden p-2 rounded-xl text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors cursor-pointer"
+                        >
+                            <svg className="w-4 h-4 text-zinc-500 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                    </div>
+
                     {/* Global Location selector (Single source of truth) */}
                     <LocationDropdown variant="navbar" align="right" />
 
@@ -210,6 +376,52 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                     )}
                 </div>
             </div>
+
+            {/* Expandable Mobile Search Overlay Bar */}
+            {isMobileSearchOpen && (
+                <div className="md:hidden absolute inset-0 bg-white dark:bg-zinc-900 z-50 px-3 flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800 shadow-md animate-in fade-in duration-150">
+                    <form onSubmit={handleSearchSubmit} className="flex-1 flex items-center gap-2" role="search">
+                        <span className="text-zinc-400 pl-1">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </span>
+                        <input
+                            ref={mobileSearchInputRef}
+                            type="text"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            onKeyDown={(e) => {
+                                if (e.key === "Escape") {
+                                    setIsMobileSearchOpen(false);
+                                }
+                            }}
+                            placeholder="Search restaurants, cuisines, cities..."
+                            aria-label="Search restaurants on mobile"
+                            className="flex-1 py-2 text-xs sm:text-sm bg-transparent text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none"
+                            autoFocus
+                        />
+                        {searchQuery && (
+                            <button
+                                type="button"
+                                onClick={clearSearch}
+                                aria-label="Clear mobile search query"
+                                className="p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 cursor-pointer"
+                            >
+                                <span className="text-sm font-bold">&times;</span>
+                            </button>
+                        )}
+                    </form>
+                    <button
+                        type="button"
+                        onClick={() => setIsMobileSearchOpen(false)}
+                        aria-label="Close mobile search"
+                        className="px-2.5 py-1.5 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg cursor-pointer transition-colors"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            )}
         </header>
     );
 }

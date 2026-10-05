@@ -21,6 +21,8 @@ export default async function Home({ searchParams }: HomePageProps) {
     const initialCuisine = typeof cuisineParam === "string" ? cuisineParam : Array.isArray(cuisineParam) ? cuisineParam[0] : undefined;
     const cityParam = resolvedParams?.city;
     const initialCity = typeof cityParam === "string" ? cityParam : Array.isArray(cityParam) ? cityParam[0] : undefined;
+    const searchParam = resolvedParams?.search;
+    const initialSearch = typeof searchParam === "string" ? searchParam : Array.isArray(searchParam) ? searchParam[0] : undefined;
     const supabase = await createClient();
     const {
         data: { user },
@@ -75,7 +77,7 @@ export default async function Home({ searchParams }: HomePageProps) {
     };
 
     return (
-        <PortalShell user={user} profile={profile} initialCity={initialCity}>
+        <PortalShell user={user} profile={profile} initialCity={initialCity} initialSearch={initialSearch}>
             <div className="space-y-12">
                 {/* Premium BRD Hero Section */}
                 <HeroSection isLoggedIn={Boolean(user)} stats={heroStats} />
