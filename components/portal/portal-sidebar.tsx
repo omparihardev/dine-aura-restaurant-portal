@@ -114,24 +114,24 @@ export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarP
     const { locationMode } = useLocation();
 
     const sidebarContent = (
-        <div className="h-full flex flex-col justify-between py-6 px-4 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-800">
+        <div className="h-full flex flex-col justify-between py-6 px-4 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-r border-zinc-200/80 dark:border-zinc-800/80">
             <div className="space-y-6">
                 {/* Section Title */}
                 <div className="px-3">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
                         Menu &bull; Navigation
                     </p>
                 </div>
 
                 {/* Active Global Discovery Location (Drawer) */}
-                <div className="p-3 rounded-2xl bg-zinc-100/80 dark:bg-zinc-800/60 border border-zinc-200/80 dark:border-zinc-700/60 space-y-2">
+                <div className="p-3 rounded-2xl bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200/70 dark:border-zinc-800/70 space-y-2 shadow-2xs">
                     <div className="flex items-center justify-between">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
                             <span>📍</span>
                             <span>Discovery Location</span>
                         </span>
                         {locationMode === "current" && (
-                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800">
+                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-500/20 dark:border-emerald-800/60">
                                 Live GPS
                             </span>
                         )}
@@ -154,11 +154,11 @@ export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarP
                                 onClick={onClose}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                                     isActive
-                                        ? "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800/80 shadow-sm"
-                                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
+                                        ? "bg-amber-500/10 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-500/20 dark:border-amber-900/60 shadow-xs font-bold"
+                                        : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100/70 dark:hover:bg-zinc-900/70 hover:text-zinc-900 dark:hover:text-zinc-100"
                                 }`}
                             >
-                                <span className={isActive ? "text-amber-600 dark:text-amber-400" : "text-zinc-400"}>
+                                <span className={isActive ? "text-amber-600 dark:text-amber-400" : "text-zinc-400 group-hover:text-zinc-600"}>
                                     {item.icon}
                                 </span>
                                 <span>{item.name}</span>
@@ -177,8 +177,8 @@ export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarP
                                 onClick={onClose}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                                     pathname.startsWith("/admin/restaurants")
-                                        ? "bg-amber-600 text-white shadow-sm"
-                                        : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-950/80 border border-amber-200/80 dark:border-amber-900/60"
+                                        ? "bg-amber-600 text-white shadow-xs"
+                                        : "text-amber-800 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-950/40 hover:bg-amber-500/20 border border-amber-500/20 dark:border-amber-900/60"
                                 }`}
                             >
                                 <span className="text-sm">🛡️</span>
@@ -189,8 +189,8 @@ export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarP
                                 onClick={onClose}
                                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                                     pathname.startsWith("/admin/reservations")
-                                        ? "bg-amber-600 text-white shadow-sm"
-                                        : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-950/80 border border-amber-200/80 dark:border-amber-900/60"
+                                        ? "bg-amber-600 text-white shadow-xs"
+                                        : "text-amber-800 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-950/40 hover:bg-amber-500/20 border border-amber-500/20 dark:border-amber-900/60"
                                 }`}
                             >
                                 <span className="text-sm">📋</span>
@@ -203,7 +203,7 @@ export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarP
 
             {/* Bottom Actions: India Info + Logout (Sidebar Item 8) */}
             <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800 space-y-3">
-                <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200/60 dark:border-zinc-700/60">
+                <div className="p-3 rounded-xl bg-zinc-50/80 dark:bg-zinc-900/50 border border-zinc-200/60 dark:border-zinc-800/60 shadow-2xs">
                     <div className="flex items-center gap-1.5 text-zinc-800 dark:text-zinc-200 font-semibold text-xs">
                         <span>🇮🇳</span>
                         <span>DineAura India</span>
@@ -220,7 +220,7 @@ export function PortalSidebar({ user, profile, isOpen, onClose }: PortalSidebarP
                             type="submit"
                             title="Sign out of your account"
                             aria-label="Logout"
-                            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-950/70 border border-red-200/80 dark:border-red-900/60 transition-colors"
+                            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-red-600 dark:text-red-400 bg-red-500/5 hover:bg-red-500/10 dark:bg-red-950/30 dark:hover:bg-red-950/60 border border-red-500/20 dark:border-red-900/40 transition-colors cursor-pointer"
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

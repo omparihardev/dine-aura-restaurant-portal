@@ -14,203 +14,145 @@ export function HeroSection({ isLoggedIn = false, stats }: HeroSectionProps) {
     const hasLiveStats = Boolean(stats && stats.totalRestaurants > 0);
 
     return (
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-600 via-amber-700 to-orange-700 text-white shadow-xl p-6 sm:p-8 lg:py-10 lg:px-12">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-                {/* Left Column: Heading, Description, CTAs & Genuine Value Badges */}
-                <div className="lg:col-span-7 space-y-4 lg:space-y-5 text-left">
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/20 text-white backdrop-blur-md shadow-sm">
-                        <span>🇮🇳</span>
-                        <span>India&apos;s Dedicated Restaurant Portal</span>
-                    </div>
+        <section className="relative rounded-3xl lg:rounded-[2.5rem] border border-zinc-800/60 shadow-2xl overflow-hidden flex flex-col justify-between text-white p-5 sm:p-8 lg:p-12 xl:p-14 lg:min-h-[calc(100vh-9.5rem)] lg:max-h-[820px]">
+            {/* Cinematic Full-Bleed Food Photography */}
+            <div className="absolute inset-0 z-0">
+                <Image
+                    src="/hero-culinary.jpg"
+                    alt="Authentic Indian Fine Dining & Traditional Regional Cuisine"
+                    fill
+                    priority
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 95vw, 1280px"
+                    className="object-cover object-[center_42%] lg:object-[center_38%] transition-transform duration-1000 ease-out hover:scale-[1.02]"
+                />
 
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight">
-                        Discover India&apos;s <span className="text-amber-200">Authentic Dining</span> &amp; Culinary Heritage
-                    </h1>
+                {/* Dark Vignette & Gradient Overlays for Maximum Readability */}
+                {/* Horizontal gradient: deep black on the left for text contrast, softening to reveal the feast on the right */}
+                <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/95 via-zinc-950/85 to-zinc-950/40 lg:from-zinc-950/92 lg:via-zinc-950/70 lg:to-black/35" />
 
-                    <p className="text-sm sm:text-base text-white/90 max-w-xl leading-relaxed">
-                        From royal Mughlai biryanis and authentic Bengaluru dosas to rich Rajasthani thalis and vibrant street food. DineAura is your trusted gateway to verified dining across India.
-                    </p>
+                {/* Vertical gradient: ground the statistics and discovery cue at the bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/40 to-transparent" />
 
-                    {/* Primary and Secondary CTAs */}
-                    <div className="pt-1 flex flex-wrap items-center gap-3.5">
-                        <Link
-                            href="/#discover"
-                            className="px-5 py-3 rounded-xl font-bold text-sm bg-white text-amber-800 hover:bg-amber-50 shadow-md hover:shadow-lg transition-all flex items-center gap-2 group cursor-pointer"
-                        >
-                            <span>Explore Restaurants</span>
-                            <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
-                        </Link>
+                {/* Subtle amber atmospheric tint matching DineAura branding */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-amber-950/30 via-transparent to-orange-950/15 mix-blend-multiply pointer-events-none" />
 
-                        <Link
-                            href="/categories"
-                            className="px-5 py-3 rounded-xl font-semibold text-sm bg-white/15 hover:bg-white/25 text-white border border-white/20 backdrop-blur-sm transition-all cursor-pointer"
-                        >
-                            Browse Cuisines
-                        </Link>
-                    </div>
+                {/* Ambient Soft Glow */}
+                <div
+                    className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"
+                    aria-hidden="true"
+                />
+            </div>
 
-                    {/* Genuine Badges: strictly backed by Supabase or genuine platform pillars (No fake numbers) */}
-                    <div className="pt-3 flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-white/85 border-t border-white/15">
-                        {hasLiveStats ? (
-                            <>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-amber-300 font-extrabold">{stats!.totalRestaurants}</span>
-                                    <span>Active Restaurants</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-amber-300 font-extrabold">{stats!.totalCities}</span>
-                                    <span>Cities Covered</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-amber-300 font-extrabold">{stats!.totalCategories}</span>
-                                    <span>Regional Cuisines</span>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-amber-300">✨</span>
-                                    <span>Verified Listings</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-amber-300">🍱</span>
-                                    <span>Regional Cuisines</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-amber-300">🔍</span>
-                                    <span>Direct Discovery</span>
-                                </div>
-                            </>
-                        )}
-                    </div>
+            {/* Top Bar: Brand Badge & Live Verification Pill */}
+            <div className="relative z-10 flex items-center justify-between gap-2 sm:gap-4">
+                <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-white/10 text-white border border-white/15 backdrop-blur-md shadow-sm">
+                    <span className="text-xs sm:text-sm">🇮🇳</span>
+                    <span className="tracking-wide">India&apos;s Dedicated Restaurant Portal</span>
                 </div>
 
-                {/* Right Column: Premium DineAura Brand & Value Panel (No fabricated restaurant) */}
-                <div className="lg:col-span-5 flex justify-center lg:justify-end">
-                    <div className="relative w-full max-w-sm sm:max-w-md rounded-3xl bg-gradient-to-tr from-amber-950/70 via-amber-900/40 to-white/10 p-5 sm:p-6 backdrop-blur-md border border-white/20 flex flex-col justify-between shadow-2xl space-y-4">
-                        {/* Panel Header */}
-                        <div>
-                            <div className="flex items-center justify-between mb-2.5">
-                                <div className="flex items-center gap-2">
-                                    <span className="w-7 h-7 rounded-lg bg-amber-500/80 flex items-center justify-center text-xs shadow">
-                                        🍽️
-                                    </span>
-                                    <span className="text-xs font-bold uppercase tracking-wider text-amber-200">
-                                        DineAura Portal
-                                    </span>
-                                </div>
-                                <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/80 text-white flex items-center gap-1.5">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                                    Live Directory
-                                </span>
-                            </div>
-
-                            <h2 className="text-lg sm:text-xl font-extrabold text-white tracking-tight leading-snug">
-                                India&apos;s Restaurant Discovery
-                            </h2>
-                            <p className="mt-1 text-xs text-white/80 leading-relaxed">
-                                Discover authentic restaurants, regional cuisines, and local dining experiences through DineAura.
-                            </p>
-                        </div>
-
-                        {/* Relevant Indian Culinary Visual (BRD Literal Requirement) */}
-                        <div className="relative w-full h-36 sm:h-40 rounded-2xl overflow-hidden shadow-lg border border-white/20 group">
-                            <Image
-                                src="/hero-culinary.jpg"
-                                alt="Authentic Indian Fine Dining & Traditional Regional Cuisine"
-                                fill
-                                sizes="(max-width: 768px) 100vw, 420px"
-                                priority
-                                className="object-cover group-hover:scale-105 transition-transform duration-700"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                            <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-xs text-white">
-                                <span className="font-bold flex items-center gap-1.5 drop-shadow text-amber-200 text-[11px] sm:text-xs">
-                                    <span>✨</span> Authentic Regional Dining
-                                </span>
-                                <span className="text-[10px] font-semibold bg-black/50 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/20 text-white/90">
-                                    Handcrafted &amp; Verified
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* 3 Core Value Items */}
-                        <div className="space-y-2.5">
-                            <div className="p-2.5 sm:p-3 rounded-xl bg-white/10 border border-white/15 flex items-start gap-2.5 transition-colors hover:bg-white/15">
-                                <div className="w-7 h-7 rounded-lg bg-amber-500/30 flex items-center justify-center text-sm flex-shrink-0">
-                                    📋
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold text-white">Real Restaurant Listings</p>
-                                    <p className="text-[11px] text-white/75 mt-0.5 leading-snug">
-                                        Verified locations, contact numbers, and authentic menus from genuine venues.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="p-2.5 sm:p-3 rounded-xl bg-white/10 border border-white/15 flex items-start gap-2.5 transition-colors hover:bg-white/15">
-                                <div className="w-7 h-7 rounded-lg bg-amber-500/30 flex items-center justify-center text-sm flex-shrink-0">
-                                    🍱
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold text-white">Regional Cuisines</p>
-                                    <p className="text-[11px] text-white/75 mt-0.5 leading-snug">
-                                        Explore traditional flavours across North, South, East, and Western India.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="p-2.5 sm:p-3 rounded-xl bg-white/10 border border-white/15 flex items-start gap-2.5 transition-colors hover:bg-white/15">
-                                <div className="w-7 h-7 rounded-lg bg-amber-500/30 flex items-center justify-center text-sm flex-shrink-0">
-                                    🔍
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold text-white">Direct Restaurant Discovery</p>
-                                    <p className="text-[11px] text-white/75 mt-0.5 leading-snug">
-                                        Filter by city or cuisine and discover your next memorable meal.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Live Supabase Statistics Counter (Only rendered if live data exists) */}
-                        {hasLiveStats && (
-                            <div className="pt-3 border-t border-white/15 grid grid-cols-3 gap-2 text-center">
-                                <div className="p-2 rounded-xl bg-white/10 border border-white/10">
-                                    <p className="text-sm sm:text-base font-extrabold text-white leading-tight">
-                                        {stats!.totalRestaurants}
-                                    </p>
-                                    <p className="text-[10px] text-amber-200 uppercase font-semibold mt-0.5">
-                                        Restaurants
-                                    </p>
-                                </div>
-                                <div className="p-2 rounded-xl bg-white/10 border border-white/10">
-                                    <p className="text-sm sm:text-base font-extrabold text-white leading-tight">
-                                        {stats!.totalCities}
-                                    </p>
-                                    <p className="text-[10px] text-amber-200 uppercase font-semibold mt-0.5">
-                                        Cities
-                                    </p>
-                                </div>
-                                <div className="p-2 rounded-xl bg-white/10 border border-white/10">
-                                    <p className="text-sm sm:text-base font-extrabold text-white leading-tight">
-                                        {stats!.totalCategories}
-                                    </p>
-                                    <p className="text-[10px] text-amber-200 uppercase font-semibold mt-0.5">
-                                        Cuisines
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 border border-white/15 backdrop-blur-md text-[11px] text-white/90">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-semibold text-amber-200">Live Directory</span>
+                    <span className="text-white/40">•</span>
+                    <span className="text-white/80">Handcrafted &amp; Verified</span>
                 </div>
             </div>
 
-            {/* Ambient Background Glow */}
-            <div
-                className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-white/10 blur-3xl pointer-events-none"
-                aria-hidden="true"
-            />
+            {/* Center Content: Main Heading, Description, and CTAs */}
+            <div className="relative z-10 my-auto py-5 sm:py-8 lg:py-10 max-w-3xl space-y-4 sm:space-y-6 text-left">
+                <h1 className="text-2xl sm:text-4xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight text-white leading-[1.12] sm:leading-[1.08] drop-shadow-sm">
+                    Discover India&apos;s{" "}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-200 to-orange-300">
+                        Authentic Dining
+                    </span>
+                    <br className="hidden sm:inline" /> &amp; Culinary Heritage
+                </h1>
+
+                <p className="text-xs sm:text-base lg:text-lg text-zinc-200/90 max-w-2xl font-normal leading-relaxed text-balance">
+                    From royal Mughlai biryanis and authentic Bengaluru dosas to rich Rajasthani thalis and vibrant street food. DineAura is your trusted gateway to verified dining across India.
+                </p>
+
+                {/* Primary and Secondary CTAs */}
+                <div className="pt-1 sm:pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
+                    <Link
+                        href="/#discover"
+                        className="inline-flex items-center gap-2 sm:gap-2.5 px-4.5 py-2.5 sm:px-6 sm:py-3.5 rounded-xl font-bold text-xs sm:text-base bg-amber-500 hover:bg-amber-400 text-zinc-950 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-200 active:scale-95 group cursor-pointer"
+                    >
+                        <span>Explore Restaurants</span>
+                        <span className="transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
+                    </Link>
+
+                    <Link
+                        href="/categories"
+                        className="inline-flex items-center gap-2 px-4.5 py-2.5 sm:px-6 sm:py-3.5 rounded-xl font-semibold text-xs sm:text-base bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md transition-all duration-200 active:scale-95 cursor-pointer"
+                    >
+                        Browse Cuisines
+                    </Link>
+                </div>
+            </div>
+
+            {/* Bottom Bar: Live Statistics & Discovery Transition Cue */}
+            <div className="relative z-10 pt-5 sm:pt-6 mt-6 sm:mt-8 border-t border-white/15 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 sm:gap-6">
+                {/* Genuine Metrics backed strictly by Supabase - Clean 3-column compact layout on mobile, horizontal on sm+ */}
+                <div className="w-full sm:w-auto">
+                    {hasLiveStats ? (
+                        <div className="grid grid-cols-3 gap-2 text-center sm:text-left sm:flex sm:items-center sm:gap-8 lg:gap-10">
+                            <div className="flex flex-col items-center sm:items-start">
+                                <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight leading-tight">
+                                    {stats!.totalRestaurants}
+                                </p>
+                                <p className="text-[10px] sm:text-xs uppercase tracking-wider text-amber-300 font-medium mt-0.5 leading-tight">
+                                    Active Restaurants
+                                </p>
+                            </div>
+                            <div className="h-8 w-px bg-white/15 hidden sm:block" />
+                            <div className="flex flex-col items-center sm:items-start">
+                                <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight leading-tight">
+                                    {stats!.totalCities}
+                                </p>
+                                <p className="text-[10px] sm:text-xs uppercase tracking-wider text-amber-300 font-medium mt-0.5 leading-tight">
+                                    Cities Covered
+                                </p>
+                            </div>
+                            <div className="h-8 w-px bg-white/15 hidden sm:block" />
+                            <div className="flex flex-col items-center sm:items-start">
+                                <p className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight leading-tight">
+                                    {stats!.totalCategories}
+                                </p>
+                                <p className="text-[10px] sm:text-xs uppercase tracking-wider text-amber-300 font-medium mt-0.5 leading-tight">
+                                    Regional Cuisines
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-3 gap-2 text-center sm:text-left sm:flex sm:items-center sm:gap-6">
+                            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm text-zinc-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
+                                <span>Verified Listings</span>
+                            </div>
+                            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm text-zinc-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
+                                <span>Regional Cuisines</span>
+                            </div>
+                            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-[10px] sm:text-sm text-zinc-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
+                                <span>Direct Discovery</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Discovery Transition Indicator (In normal content flow below stats on mobile; aligned right on sm+) */}
+                <div className="flex items-center justify-center sm:justify-end pt-1 sm:pt-0">
+                    <Link
+                        href="/#discover"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 hover:bg-black/60 border border-white/15 backdrop-blur-md text-xs font-medium text-zinc-200 hover:text-white transition-all duration-200 group cursor-pointer"
+                    >
+                        <span className="tracking-wide text-[11px] sm:text-xs">Discover restaurants</span>
+                        <span className="text-amber-400 font-bold group-hover:translate-y-0.5 transition-transform duration-200">↓</span>
+                    </Link>
+                </div>
+            </div>
         </section>
     );
 }

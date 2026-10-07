@@ -29,16 +29,16 @@ export default async function ProfilePage() {
 
     return (
         <PortalShell user={user} profile={profile}>
-            <div className="space-y-10 max-w-4xl mx-auto">
-                <div className="space-y-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
+            <div className="space-y-12 max-w-4xl mx-auto py-2 sm:py-4">
+                <div className="space-y-3.5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-500/20 dark:border-amber-900/60 w-fit shadow-2xs">
                         <span>👤</span>
                         <span>DineAura Account &bull; Profile Management</span>
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
                         My Profile &amp; Account
                     </h1>
-                    <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+                    <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed text-balance">
                         View and update your personal details stored securely in Supabase.
                     </p>
                 </div>

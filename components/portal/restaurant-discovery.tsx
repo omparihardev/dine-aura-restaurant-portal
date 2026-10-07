@@ -310,7 +310,7 @@ export function RestaurantDiscovery({
                         <span>{isLoading ? "Refreshing..." : "Refresh"}</span>
                     </button>
 
-                    <span className="px-3 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-semibold text-xs border border-amber-200 dark:border-amber-900 whitespace-nowrap">
+                    <span className="px-3 py-1.5 rounded-full bg-amber-500/10 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-semibold text-xs border border-amber-500/20 dark:border-amber-900/60 whitespace-nowrap shadow-2xs">
                         {sortedRestaurants.length} {sortedRestaurants.length === 1 ? "restaurant found" : "restaurants found"}
                         {locationMode === "current"
                             ? " near you"
@@ -347,7 +347,7 @@ export function RestaurantDiscovery({
             )}
 
             {/* Filter, Search, and Sort Bar */}
-            <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-center">
                     {/* Search text input */}
                     <div className="relative col-span-1 sm:col-span-2 lg:col-span-4">
@@ -505,7 +505,7 @@ export function RestaurantDiscovery({
                             <Link
                                 key={res.id}
                                 href={`/restaurants/${res.id}`}
-                                className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-amber-400 dark:hover:border-amber-500/50 transition-all flex flex-col justify-between block focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                className="group bg-white dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:shadow-amber-500/5 hover:border-amber-500/40 dark:hover:border-amber-500/30 transition-all duration-300 flex flex-col justify-between block focus:outline-none focus:ring-2 focus:ring-amber-500"
                             >
                                 <div>
                                     {/* Top Image Banner */}

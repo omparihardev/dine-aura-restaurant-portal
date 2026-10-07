@@ -65,33 +65,30 @@ export function LocationDropdown({
     const buttonLabel = isLocating
         ? "Detecting location..."
         : locationMode === "current"
-        ? `📍 ${liveCityLabel}`
-        : locationMode === "all"
-        ? "🌐 All Metros & Cities"
-        : `📍 ${selectedCity}`;
+            ? `📍 ${liveCityLabel}`
+            : locationMode === "all"
+                ? "🌐 All Metros & Cities"
+                : `📍 ${selectedCity}`;
 
     // Base button styles per variant
     const getButtonStyles = () => {
         if (variant === "navbar") {
-            return `flex items-center justify-between gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl transition-all shadow-sm text-xs font-bold cursor-pointer select-none max-w-[170px] sm:max-w-[210px] ${
-                locationMode === "current"
+            return `flex items-center justify-between gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl transition-all shadow-sm text-xs font-bold cursor-pointer select-none max-w-[170px] sm:max-w-[210px] ${locationMode === "current"
                     ? "bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100 hover:bg-emerald-100/70"
                     : "bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200/60 dark:hover:bg-zinc-700/60 border border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200"
-            }`;
+                }`;
         }
         if (variant === "sidebar") {
-            return `w-full px-2.5 py-1.5 text-xs font-bold rounded-lg border flex items-center justify-between text-left transition-colors cursor-pointer select-none ${
-                locationMode === "current"
+            return `w-full px-2.5 py-1.5 text-xs font-bold rounded-lg border flex items-center justify-between text-left transition-colors cursor-pointer select-none ${locationMode === "current"
                     ? "bg-emerald-50 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-100"
                     : "bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800"
-            }`;
+                }`;
         }
         // discovery variant
-        return `w-full px-3 py-2 text-xs sm:text-sm rounded-xl border font-medium flex items-center justify-between text-left transition-colors cursor-pointer select-none shadow-sm ${
-            locationMode === "current"
+        return `w-full px-3 py-2 text-xs sm:text-sm rounded-xl border font-medium flex items-center justify-between text-left transition-colors cursor-pointer select-none shadow-sm ${locationMode === "current"
                 ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200"
                 : "bg-zinc-50 dark:bg-zinc-800/80 border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-        }`;
+            }`;
     };
 
     return (
@@ -126,16 +123,15 @@ export function LocationDropdown({
                         {isLocating
                             ? "Detecting location..."
                             : locationMode === "current"
-                            ? liveCityLabel
-                            : locationMode === "all"
-                            ? "All Metros & Cities"
-                            : selectedCity}
+                                ? liveCityLabel
+                                : locationMode === "all"
+                                    ? "All Metros & Cities"
+                                    : selectedCity}
                     </span>
                 </div>
                 <svg
-                    className={`w-3.5 h-3.5 text-zinc-500 transition-transform duration-200 flex-shrink-0 ${
-                        isOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-3.5 h-3.5 text-zinc-500 transition-transform duration-200 flex-shrink-0 ${isOpen ? "rotate-180" : ""
+                        }`}
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -149,9 +145,8 @@ export function LocationDropdown({
                 <div
                     role="listbox"
                     aria-label="Select location"
-                    className={`absolute mt-1.5 w-64 sm:w-72 bg-zinc-900 border border-zinc-700/80 text-zinc-100 shadow-2xl rounded-2xl p-2 z-50 animate-in fade-in slide-in-from-top-1 ring-1 ring-black/40 ${
-                        align === "right" ? "right-0" : "left-0"
-                    }`}
+                    className={`absolute mt-1.5 w-64 sm:w-72 bg-zinc-900 border border-zinc-700/80 text-zinc-100 shadow-2xl rounded-2xl p-2 z-50 animate-in fade-in slide-in-from-top-1 ring-1 ring-black/40 ${align === "right" ? "right-0" : "left-0"
+                        }`}
                 >
                     {/* SECTION 1: GPS Options */}
                     <div className="space-y-1">
@@ -207,11 +202,10 @@ export function LocationDropdown({
                                 setSelectedCity("All Metros & Cities");
                                 setIsOpen(false);
                             }}
-                            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-colors flex items-center justify-between cursor-pointer ${
-                                locationMode === "all"
+                            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-colors flex items-center justify-between cursor-pointer ${locationMode === "all"
                                     ? "bg-amber-950/60 border border-amber-800/80 text-amber-300"
                                     : "text-zinc-200 hover:bg-zinc-800 hover:text-white"
-                            }`}
+                                }`}
                         >
                             <span className="flex items-center gap-2">
                                 <span>🌐</span>
@@ -246,11 +240,10 @@ export function LocationDropdown({
                                             setSelectedCity(city);
                                             setIsOpen(false);
                                         }}
-                                        className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-between cursor-pointer ${
-                                            isSelected
+                                        className={`w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center justify-between cursor-pointer ${isSelected
                                                 ? "bg-amber-950/60 border border-amber-800/80 text-amber-300 font-bold"
                                                 : "text-zinc-300 hover:bg-zinc-800 hover:text-white"
-                                        }`}
+                                            }`}
                                     >
                                         <span className="flex items-center gap-2">
                                             <span>📍</span>

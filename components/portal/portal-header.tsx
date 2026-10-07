@@ -41,8 +41,8 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
     const portalSearch = usePortalSearch();
 
     const searchQuery = portalSearch?.searchQuery ?? "";
-    const setSearchQuery = portalSearch?.setSearchQuery ?? (() => {});
-    const clearSearch = portalSearch?.clearSearch ?? (() => {});
+    const setSearchQuery = portalSearch?.setSearchQuery ?? (() => { });
+    const clearSearch = portalSearch?.clearSearch ?? (() => { });
 
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const desktopSearchInputRef = useRef<HTMLInputElement>(null);
@@ -146,29 +146,29 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
     const initial = displayName.charAt(0).toUpperCase();
 
     return (
-        <header className="fixed top-0 left-0 right-0 h-16 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 z-30 transition-all">
-            <div className="h-full px-4 sm:px-6 flex items-center justify-between gap-4">
+        <header className="fixed top-0 left-0 right-0 h-16 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md border-b border-zinc-200/80 dark:border-zinc-800/80 z-30 transition-all">
+            <div className="h-full px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4">
                 {/* Left section: Mobile menu toggle + DineAura Brand */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                     <button
                         type="button"
                         onClick={onMenuToggle}
                         aria-label="Toggle navigation drawer"
-                        className="lg:hidden p-2 rounded-xl text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
+                        className="lg:hidden p-1.5 sm:p-2 rounded-xl text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-colors"
                     >
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
                     </button>
 
-                    <Link href="/" className="flex items-center gap-2.5 group">
-                        <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-lg shadow-sm group-hover:scale-105 transition-transform">
+                    <Link href="/" className="flex items-center gap-2 group flex-shrink-0">
+                        <span className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 flex items-center justify-center text-white text-base sm:text-lg shadow-sm shadow-amber-500/20 group-hover:scale-105 transition-transform flex-shrink-0">
                             🍽️
                         </span>
                         <div className="flex flex-col">
-                            <span className="text-lg font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
+                            <span className="text-base sm:text-lg font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-1 sm:gap-1.5">
                                 DineAura
-                                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
+                                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-full bg-amber-500/10 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 border border-amber-500/20 dark:border-amber-900/60">
                                     India
                                 </span>
                             </span>
@@ -179,7 +179,7 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                 {/* Center section: BRD Navbar Items */}
                 <nav
                     aria-label="Main Navigation"
-                    className="hidden xl:flex items-center gap-1.5 bg-zinc-100/80 dark:bg-zinc-800/60 p-1 rounded-xl border border-zinc-200/80 dark:border-zinc-700/60"
+                    className="hidden xl:flex items-center gap-1 bg-zinc-100/70 dark:bg-zinc-800/50 p-1 rounded-xl border border-zinc-200/70 dark:border-zinc-700/50 backdrop-blur-xs"
                 >
                     {NAVBAR_ITEMS.map((item) => {
                         const currentPath = pathname || "/";
@@ -192,47 +192,19 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                             <Link
                                 key={item.name}
                                 href={item.href}
-                                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
-                                    isActive
-                                        ? "bg-white dark:bg-zinc-900 text-amber-700 dark:text-amber-400 shadow-sm border border-zinc-200/60 dark:border-zinc-700/60"
-                                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-200/60 dark:hover:bg-zinc-700/60"
-                                }`}
+                                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${isActive
+                                        ? "bg-white dark:bg-zinc-900 text-amber-700 dark:text-amber-400 shadow-xs border border-zinc-200/70 dark:border-zinc-700/60 font-bold"
+                                        : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-white/60 dark:hover:bg-zinc-700/40"
+                                    }`}
                             >
                                 {item.name}
                             </Link>
                         );
                     })}
-
-                    {profile?.role === "admin" && (
-                        <div className="flex items-center gap-1 pl-1 border-l border-zinc-200 dark:border-zinc-700">
-                            <Link
-                                href="/admin/restaurants"
-                                title="Manage Restaurants"
-                                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 ${
-                                    (pathname || "").startsWith("/admin/restaurants")
-                                        ? "bg-amber-600 text-white shadow-sm"
-                                        : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-900 hover:bg-amber-100"
-                                }`}
-                            >
-                                <span>🛡️ Restaurants</span>
-                            </Link>
-                            <Link
-                                href="/admin/reservations"
-                                title="Manage Reservations"
-                                className={`px-2.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 ${
-                                    (pathname || "").startsWith("/admin/reservations")
-                                        ? "bg-amber-600 text-white shadow-sm"
-                                        : "text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/70 border border-amber-200 dark:border-amber-900 hover:bg-amber-100"
-                                }`}
-                            >
-                                <span>📋 Reservations</span>
-                            </Link>
-                        </div>
-                    )}
                 </nav>
 
                 {/* Right section: Search + Global Location selector + User Profile / Auth State */}
-                <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
                     {/* Functional BRD Header Search Control */}
                     <div className="flex items-center">
                         {/* Real Desktop & Tablet Search Input */}
@@ -299,8 +271,10 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                         </button>
                     </div>
 
-                    {/* Global Location selector (Single source of truth) */}
-                    <LocationDropdown variant="navbar" align="right" />
+                    {/* Global Location selector (Desktop/Tablet in navbar; on mobile cleanly accessible in mobile sidebar drawer & discovery) */}
+                    <div className="hidden sm:block">
+                        <LocationDropdown variant="navbar" align="right" />
+                    </div>
 
                     {/* Non-intrusive Geolocation Notification */}
                     {locationError && (
@@ -329,7 +303,7 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                             {/* Authenticated user capsule */}
                             <Link
                                 href="/profile"
-                                className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors border border-zinc-200 dark:border-zinc-700"
+                                className="flex items-center gap-1.5 p-1 sm:pl-1.5 sm:pr-2.5 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors border border-zinc-200 dark:border-zinc-700"
                             >
                                 <div className="w-7 h-7 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
                                     {initial}
@@ -350,7 +324,7 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                                     type="submit"
                                     title="Sign out of DineAura"
                                     aria-label="Sign out"
-                                    className="px-3 py-1.5 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 border border-zinc-200 dark:border-zinc-700 hover:border-red-300 dark:hover:border-red-800 transition-all flex items-center gap-1.5"
+                                    className="p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-red-600 dark:hover:text-red-400 border border-zinc-200 dark:border-zinc-700 hover:border-red-300 dark:hover:border-red-800 transition-all flex items-center gap-1.5"
                                 >
                                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path
@@ -368,7 +342,7 @@ export function PortalHeader({ user, profile, onMenuToggle }: PortalHeaderProps)
                         <div className="flex items-center gap-2">
                             <Link
                                 href="/login"
-                                className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-all"
+                                className="px-3 sm:px-4 py-1.5 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-all"
                             >
                                 Sign In
                             </Link>

@@ -21,7 +21,7 @@ export function PortalShell({ user, profile, initialSearch, children }: PortalSh
 
     return (
         <SearchProvider initialSearch={initialSearch}>
-            <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col">
+            <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col selection:bg-amber-500/20 selection:text-amber-900 dark:selection:text-amber-200">
                 {/* Top Navigation Bar */}
                 <PortalHeader
                     user={user}
@@ -44,9 +44,9 @@ export function PortalShell({ user, profile, initialSearch, children }: PortalSh
                     </main>
 
                     {/* Footer */}
-                    <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-6 px-4 sm:px-6 lg:pl-8 text-center text-xs text-zinc-500">
+                    <footer className="border-t border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm py-6 px-4 sm:px-6 lg:pl-8 text-center text-xs text-zinc-500 dark:text-zinc-400">
                         <p>
-                            &copy; {new Date().getFullYear()} DineAura Portal. India&apos;s culinary guide. All prices in INR (₹).
+                            &copy; {new Date().getFullYear()} DineAura Portal &bull; India&apos;s Culinary Heritage Guide &bull; All prices in INR (₹)
                         </p>
                     </footer>
                 </div>

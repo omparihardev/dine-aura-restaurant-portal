@@ -39,16 +39,16 @@ export default async function HelpPage() {
 
     return (
         <PortalShell user={user} profile={profile}>
-            <div className="space-y-10 max-w-4xl mx-auto">
-                <div className="space-y-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
+            <div className="space-y-12 max-w-4xl mx-auto py-2 sm:py-4">
+                <div className="space-y-3.5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-500/20 dark:border-amber-900/60 w-fit shadow-2xs">
                         <span>❓</span>
                         <span>Help &amp; Support &bull; FAQ</span>
                     </div>
-                    <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
+                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
                         Frequently Asked Questions
                     </h1>
-                    <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400">
+                    <p className="text-sm sm:text-base text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed text-balance">
                         Find answers to common questions about using DineAura.
                     </p>
                 </div>
@@ -57,7 +57,7 @@ export default async function HelpPage() {
                     {FAQS.map((faq) => (
                         <div
                             key={faq.q}
-                            className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-2"
+                            className="p-6 sm:p-7 rounded-2xl bg-white dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs hover:border-amber-500/30 hover:shadow-md hover:shadow-amber-500/5 transition-all duration-300 space-y-2"
                         >
                             <h2 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                                 {faq.q}

@@ -45,7 +45,7 @@ export function RestaurantMenuView({
         <section
             id="restaurant-menu"
             aria-labelledby="menu-heading"
-            className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-6"
+            className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-zinc-900/70 border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs backdrop-blur-xs space-y-6"
         >
             {/* Menu Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-zinc-100 dark:border-zinc-800">
@@ -120,7 +120,7 @@ export function RestaurantMenuView({
                                 onClick={() => setSelectedCategory("all")}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                                     selectedCategory === "all"
-                                        ? "bg-amber-600 text-white shadow-sm"
+                                        ? "bg-amber-500 text-white shadow-xs"
                                         : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-100"
                                 }`}
                             >
@@ -140,7 +140,7 @@ export function RestaurantMenuView({
                                         onClick={() => setSelectedCategory(cat)}
                                         className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                                             isSelected
-                                                ? "bg-amber-600 text-white shadow-sm"
+                                                ? "bg-amber-500 text-white shadow-xs"
                                                 : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 hover:text-zinc-900 dark:hover:text-zinc-100"
                                         }`}
                                     >
@@ -177,7 +177,7 @@ export function RestaurantMenuView({
                                     {items.map((item) => (
                                         <li
                                             key={item.id}
-                                            className="p-3.5 sm:p-4 rounded-2xl bg-zinc-50/70 dark:bg-zinc-800/50 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/80 border border-zinc-200/70 dark:border-zinc-700/60 transition-colors flex flex-col justify-between gap-2"
+                                            className="p-3.5 sm:p-4 rounded-xl bg-zinc-50/70 dark:bg-zinc-800/40 hover:bg-zinc-100/70 dark:hover:bg-zinc-800/70 border border-zinc-200/70 dark:border-zinc-800/70 hover:border-amber-500/30 transition-all duration-200 flex flex-col justify-between gap-2 shadow-2xs"
                                         >
                                             <div className="flex items-start justify-between gap-3">
                                                 <div className="space-y-1 min-w-0 flex-1">

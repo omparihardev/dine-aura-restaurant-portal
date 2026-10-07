@@ -131,7 +131,7 @@ export function UserReservationsView({ initialReservations }: UserReservationsVi
             )}
 
             {/* Header banner */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-zinc-200 dark:border-zinc-800">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-zinc-200/80 dark:border-zinc-800/80">
                 <div>
                     <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2.5">
                         <span>🗓️</span> My Reservations
@@ -143,7 +143,7 @@ export function UserReservationsView({ initialReservations }: UserReservationsVi
 
                 <Link
                     href="/"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-all self-start sm:self-auto"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white shadow-xs hover:shadow-md transition-all active:scale-95 self-start sm:self-auto cursor-pointer"
                 >
                     <span>🔍</span> Explore Restaurants
                 </Link>
@@ -167,17 +167,17 @@ export function UserReservationsView({ initialReservations }: UserReservationsVi
                             key={tab.id}
                             type="button"
                             onClick={() => setSelectedStatus(tab.id)}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ${
                                 isActive
-                                    ? "bg-amber-600 text-white shadow-sm"
-                                    : "bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800"
+                                    ? "bg-amber-600 text-white shadow-xs font-bold"
+                                    : "bg-white dark:bg-zinc-900/80 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-800/80 shadow-2xs"
                             }`}
                         >
                             <span>{tab.label}</span>
                             <span
                                 className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                                     isActive
-                                        ? "bg-amber-700 text-amber-100"
+                                        ? "bg-amber-700 text-amber-100 font-bold"
                                         : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
                                 }`}
                             >
@@ -190,8 +190,8 @@ export function UserReservationsView({ initialReservations }: UserReservationsVi
 
             {/* Reservations List / Empty State */}
             {filteredReservations.length === 0 ? (
-                <div className="text-center py-16 px-4 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-4">
-                    <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-3xl">
+                <div className="text-center py-16 px-4 bg-white dark:bg-zinc-900/70 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs space-y-4">
+                    <div className="w-16 h-16 mx-auto rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center text-3xl shadow-2xs">
                         🍽️
                     </div>
                     <div className="space-y-1">
@@ -209,7 +209,7 @@ export function UserReservationsView({ initialReservations }: UserReservationsVi
                     <div className="pt-2">
                         <Link
                             href="/"
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-sm transition-all"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white shadow-xs hover:shadow-md transition-all active:scale-95 cursor-pointer"
                         >
                             <span>Explore Restaurants</span>
                             <span>&rarr;</span>
@@ -227,7 +227,7 @@ export function UserReservationsView({ initialReservations }: UserReservationsVi
                         return (
                             <div
                                 key={r.id}
-                                className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col justify-between hover:border-amber-400/60 dark:hover:border-amber-600/60 transition-all"
+                                className="bg-white dark:bg-zinc-900/80 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-xs overflow-hidden flex flex-col justify-between hover:shadow-xl hover:shadow-amber-500/5 hover:border-amber-500/40 dark:hover:border-amber-500/30 transition-all duration-300"
                             >
                                 <div className="p-4 sm:p-5 space-y-3.5">
                                     {/* Card Header: Restaurant & Status */}

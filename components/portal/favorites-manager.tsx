@@ -79,9 +79,9 @@ export function FavoritesManager({ allRestaurants }: FavoritesManagerProps) {
             )}
 
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800 pb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200/80 dark:border-zinc-800/80 pb-6">
                 <div className="space-y-1.5">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/10 dark:bg-red-950/60 text-red-700 dark:text-red-400 border border-red-500/20 dark:border-red-900/60 shadow-2xs">
                         <span>❤️</span>
                         <span>Saved Places &bull; Browser Sync</span>
                     </div>
@@ -94,13 +94,13 @@ export function FavoritesManager({ allRestaurants }: FavoritesManagerProps) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <span className="px-3.5 py-1.5 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-semibold text-xs border border-amber-200 dark:border-amber-900">
+                    <span className="px-3.5 py-1.5 rounded-full bg-amber-500/10 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-semibold text-xs border border-amber-500/20 dark:border-amber-900/60 shadow-2xs">
                         {isMounted ? `${favoriteRestaurants.length} ${favoriteRestaurants.length === 1 ? "Favorite" : "Favorites"}` : "Loading..."}
                     </span>
 
                     <Link
                         href="/#discover"
-                        className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 shadow-sm"
+                        className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200/80 dark:border-zinc-700/80 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
                     >
                         <span>&larr;</span>
                         <span>Discover More</span>
@@ -114,7 +114,7 @@ export function FavoritesManager({ allRestaurants }: FavoritesManagerProps) {
                     {favoriteRestaurants.map((res) => (
                         <article
                             key={res.id}
-                            className="group bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:border-amber-300 dark:hover:border-amber-900/50 transition-all flex flex-col justify-between"
+                            className="group bg-white dark:bg-zinc-900/80 border border-zinc-200/80 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl hover:shadow-amber-500/5 hover:border-amber-500/40 dark:hover:border-amber-500/30 transition-all duration-300 flex flex-col justify-between"
                         >
                             <div>
                                 {/* Top Image Banner */}
